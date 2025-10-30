@@ -169,6 +169,7 @@ class _RegisterAgreenState extends State<RegisterAgreen> {
                     return null;
                   },
                 ),
+                //register button
                 SizedBox(height: 40),
                 SizedBox(
                   width: double.infinity,
@@ -180,16 +181,10 @@ class _RegisterAgreenState extends State<RegisterAgreen> {
                       ),
                     ),
                     onPressed: () async {
-                      final email = emailController.text;
-                      final password = passwordController.text;
-                      final username = await DbHelper.loginUser(
-                        email: email,
-                        password: password,
-                        );
-                        if (username !=null) {
-                          
-                        }
-                      print('register');
+                      if (formKey.currentState!.validate()){
+                        print('register');
+                      }
+                       //sampe sini
                       setState(() {});
                     },
                     child: Text(
