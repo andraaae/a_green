@@ -5,45 +5,40 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DbHelper {
+  static const String _dbName = 'a_Green.db';
   static const tableUser = 'Users';
 
   static Future<Database> db() async {
     final dbPath = await getDatabasesPath();
     return openDatabase(
       join(dbPath, 'aGreen.db'),
+    
       onCreate: (db, version) async {
         await db.execute(
           "CREATE TABLE $tableUser(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, email TEXT, password TEXT, phone TEXT)",
         );
+        print("Table $tableUser created succesfully");
       },
 
       onUpgrade: (db, oldVersion, newVersion) async {
-        if (newVersion == 2) {
+        if (oldVersion < 2) {
           await db.execute(
-            "CREATE TABLE $tableUser(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, email TEXT, password TEXT )",
+            "ALTER TABLE $tableUser(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, email TEXT, password TEXT )",
           );
+          print("Column 'address' added to $tableUser");
+        }
+        if (oldVersion < 3) {
+          await db.execute("ALTER TABLE $tableUser ADD COLUMN address TEXT");
+          print("Column 'address' added to $tableUser");
         }
       },
       version: 3,
     );
   }
 
-  // static Future<void> checkAllUsers() async {
-  //   final dbs = await db();
-  //   final result = await dbs.query(tableUser);
-  //   print("CEK ISI TABEL UserS: $result");
-  // }
-
+  //register user
   static Future<void> registerUser(UserModel user) async {
     final dbs = await db();
-    // await dbs.insert(
-    //   tableUser,
-    //   User.toMap(),
-    //   conflictAlgorithm: ConflictAlgorithm.replace,
-    // );
-    //print('User inserted: ${User.toMap()}');
-
-    //Insert adalah fungsi untuk menambahkan data (CREATE)
     await dbs.insert(
       tableUser,
       user.toMap(),
@@ -52,6 +47,7 @@ class DbHelper {
     print(user.toMap());
   }
 
+  //login user
   static Future<UserModel?> loginUser({
     required String email,
     required String password,
@@ -113,7 +109,8 @@ class DbHelper {
   //delete user
   static Future<void> deleteUser(int id) async {
     final dbs = await db();
-    //Insert adalah fungsi untuk menambahkan data (CREATE)
+
     await dbs.delete(tableUser, where: "id = ?", whereArgs: [id]);
+    print("user $id deleted");
   }
 }

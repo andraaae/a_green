@@ -1,4 +1,8 @@
 import 'package:a_green/aGreen/database/db_helper.dart';
+import 'package:a_green/aGreen/view/first_page_agreen.dart';
+import 'package:a_green/aGreen/view/home_page_agreen.dart';
+import 'package:a_green/aGreen/view/login_agreen.dart';
+import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 class RegisterAgreen extends StatefulWidget {
@@ -39,7 +43,6 @@ class _RegisterAgreenState extends State<RegisterAgreen> {
 
                     //menambahkan username, email, nomor telephone, dan password
                     SizedBox(height: 29),
-
                     Row(children: [Text('Username')]),
                     SizedBox(height: 7),
                     Form(
@@ -181,11 +184,17 @@ class _RegisterAgreenState extends State<RegisterAgreen> {
                       ),
                     ),
                     onPressed: () async {
-                      if (formKey.currentState!.validate()){
-                        print('register');
+                      if (formKey.currentState!.validate()) {
+                        print('Register Success fpr ${emailController.text}');
+
+                        //pindah ke halamamn home
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FirstPageAgreen(),
+                          ),
+                        );
                       }
-                       //sampe sini
-                      setState(() {});
                     },
                     child: Text(
                       'Register',
@@ -197,7 +206,7 @@ class _RegisterAgreenState extends State<RegisterAgreen> {
                   ),
                 ),
 
-                //
+                //login link
                 SizedBox(height: 18),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -205,7 +214,13 @@ class _RegisterAgreenState extends State<RegisterAgreen> {
                     Text("Already have an account?"),
                     TextButton(
                       onPressed: () {
-                        print('Login');
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginAgreen(),
+                          ),
+                        );
+                        print('Navigate to login page');
                       },
                       child: Text(
                         "Login here",

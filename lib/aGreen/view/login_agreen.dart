@@ -1,4 +1,8 @@
 import 'package:a_green/aGreen/database/db_helper.dart';
+import 'package:a_green/aGreen/view/first_page_agreen.dart';
+import 'package:a_green/aGreen/view/home_page_agreen.dart';
+import 'package:a_green/aGreen/models/user_model.dart';
+import 'package:a_green/aGreen/view/register_agreen.dart';
 import 'package:flutter/material.dart';
 
 class LoginAgreen extends StatefulWidget {
@@ -171,26 +175,37 @@ class _LoginAgreenState extends State<LoginAgreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: isButtonEnable
                             ? const Color(0xffB3E2A7)
-                            : Colors.grey,
+                            : Color(0xffB3E2A7),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: isButtonEnable
-                          ? () async {
-                              final email = emailController.text;
-                              final password = passwordController.text;
-                              final phone = await DbHelper.loginUser(
-                                email: email, 
-                                password: password
-                                );
-                             
-                              
-                              if (formKey.currentState!.validate()) {
-                                print('Login pressed');
-                              }
-                            }
-                          : null,
+                      onPressed: () async {
+                        final email = emailController.text.trim();
+                        final password = passwordController.text.trim();
+                        final user = await DbHelper.loginUser(
+                          email: email,
+                          password: password,
+                        );
+                        if (user != null) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomePageAgreen(),
+                            ),
+                          );
+                          print('Register Success for ${emailController.text}');
+
+                          //pindah ke halamamn home
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomePageAgreen(),
+                            ),
+                          );
+                        }
+                      },
+
                       child: const Text(
                         'Login',
                         style: TextStyle(
@@ -216,6 +231,12 @@ class _LoginAgreenState extends State<LoginAgreen> {
                       ),
                       TextButton(
                         onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RegisterAgreen(),
+                            ),
+                          );
                           print('Register now');
                         },
                         child: const Text(
