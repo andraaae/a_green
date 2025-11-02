@@ -7,19 +7,26 @@ import 'package:sqflite/sqflite.dart';
 class DbHelper {
   static const String _dbName = 'a_Green.db';
   static const tableUser = 'Users';
-
+  static const tablePlants = 'Plants';
   static Future<Database> db() async {
     final dbPath = await getDatabasesPath();
     return openDatabase(
-      join(dbPath, 'aGreen.db'),
+      join(dbPath, _dbName),
     
       onCreate: (db, version) async {
         await db.execute(
           "CREATE TABLE $tableUser(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, email TEXT, password TEXT, phone TEXT)",
         );
         print("Table $tableUser created succesfully");
-      },
 
+        await db.execute(
+          "CREATE TABLE $tablePlants("  // 🆕 buat tabel plant
+          "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+          "name TEXT, plant TEXT, status TEXT)"
+        );
+
+      },
+      
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           await db.execute(
@@ -35,6 +42,8 @@ class DbHelper {
       version: 3,
     );
   }
+
+  
 
   //register user
   static Future<void> registerUser(UserModel user) async {
@@ -113,4 +122,38 @@ class DbHelper {
     await dbs.delete(tableUser, where: "id = ?", whereArgs: [id]);
     print("user $id deleted");
   }
+   // Add Plant
+  static Future<void> addPlant(Map<String, dynamic> plant) async {
+    final dbInstance = await db();
+    await dbInstance.insert(
+      tablePlants,
+      plant,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    print("Plant added: $plant");
+  }
+
+  // Get plants by userId
+  static Future<List<Map<String, dynamic>>> getPlantsByUser(int userId) async {
+    final dbInstance = await db();
+    return await dbInstance.query(
+      tablePlants,
+      where: 'userId = ?',
+      whereArgs: [userId],
+    );
+  }
+
+  // Delete plant by id
+  static Future<void> deletePlant(int id) async {
+    final dbInstance = await db();
+    await dbInstance.delete(
+      tablePlants,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    print("Plant $id deleted");
+  }
 }
+
+
+

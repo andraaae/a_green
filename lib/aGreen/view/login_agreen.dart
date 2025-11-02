@@ -1,7 +1,5 @@
 import 'package:a_green/aGreen/database/db_helper.dart';
-import 'package:a_green/aGreen/view/first_page_agreen.dart';
 import 'package:a_green/aGreen/view/home_page_agreen.dart';
-import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:a_green/aGreen/view/register_agreen.dart';
 import 'package:flutter/material.dart';
 
@@ -188,19 +186,19 @@ class _LoginAgreenState extends State<LoginAgreen> {
                           password: password,
                         );
                         if (user != null) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomePageAgreen(),
-                            ),
-                          );
-                          print('Register Success for ${emailController.text}');
+                          // Navigator.pushReplacement(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => HomePageAgreen(),
+                          //   ),
+                          // );
+                          // print('Register Success for ${emailController.text}');
 
                           //pindah ke halamamn home
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => HomePageAgreen(),
+                              builder: (context) => HomePageAgreen(user: user),
                             ),
                           );
                         }
@@ -234,7 +232,7 @@ class _LoginAgreenState extends State<LoginAgreen> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => RegisterAgreen(),
+                              builder: (context) => RegisterAgreen(user: user), //sampe sini
                             ),
                           );
                           print('Register now');

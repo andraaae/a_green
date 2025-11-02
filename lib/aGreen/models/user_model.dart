@@ -3,11 +3,11 @@ import 'dart:convert';
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 class UserModel {
   int? id;
-  String? username;
-  String? email;
-  String? password;
-  String? phone;
-  String? address;
+ final String? username;
+  final String? email;
+  final String? password;
+ final String? phone;
+ final String? address;
 
   UserModel({
     this.id,

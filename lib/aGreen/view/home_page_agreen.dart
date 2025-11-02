@@ -2,15 +2,19 @@ import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 class HomePageAgreen extends StatefulWidget {
-  //final UserModel user;
-  //const HomePageAgreen({Key? key, required this.user}) : super(key: key);
+  @override
+  
+  // const HomePageAgreen({super.key});
+
+  final UserModel user;
+  const HomePageAgreen({Key? key, required this.user}) : super(key: key);
 
   @override
   State<HomePageAgreen> createState() => _HomePageAgreenState();
 }
 
 class _HomePageAgreenState extends State<HomePageAgreen> {
-  int _selectedIndex = 0;
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,14 +26,15 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 12),
-              Text('Hello,  !', style: TextStyle(fontSize: 15)),
+              SizedBox(height: 20),
+              Text('Hello, ${widget.user} !', style: TextStyle(fontSize: 20)),
+              SizedBox(height: 10),
               Text(
                 'How is your green friends today?',
-                style: TextStyle(fontSize: 12),
+                style: TextStyle(fontSize: 18),
               ),
-              SizedBox(height: 20),
-              Text('Your plant(s)', style: TextStyle(fontSize: 14)),
+              SizedBox(height: 25),
+              Text('Your plant(s)', style: TextStyle(fontSize: 16)),
               SizedBox(height: 14),
               Center(
                 child: Container(
@@ -61,21 +66,22 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                           children: [
                             Text(
                               "Oci the Orchid",
-                              style: TextStyle(fontSize: 15),
+                              style: TextStyle(fontSize: 18),
                             ),
                             Text("Orchid", style: TextStyle(fontSize: 13)),
                             Text(
                               "61% humidity",
-                              style: TextStyle(fontSize: 10),
+                              style: TextStyle(fontSize: 12),
                             ),
                             LinearProgressIndicator(
                               borderRadius: BorderRadius.circular(11),
                               value: 0.6,
                               backgroundColor: Color(0x80A6AD88),
                             ),
+                            SizedBox(height: 8),
                             Text(
                               "Day 0 has not been watered",
-                              style: TextStyle(fontSize: 11),
+                              style: TextStyle(fontSize: 13),
                             ),
                           ],
                         ),
@@ -88,40 +94,7 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Color(0xFF9ACDA3),
-        onPressed: () {},
-        child: Icon(Icons.add, color: Colors.white),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          print(index);
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined, color: Color(0xFF9ACDA3)),
-            label: 'home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.access_time, color: Color(0xFF9ACDA3)),
-            label: 'Reminder',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book_rounded, color: Color(0xFF9ACDA3)),
-            label: 'Journal',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline, color: Color(0xFF9ACDA3)),
-            label: 'Profile',
-          ),
-        ],
-      ),
+      
     );
   }
 }

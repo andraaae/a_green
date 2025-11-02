@@ -1,12 +1,10 @@
-import 'package:a_green/aGreen/database/db_helper.dart';
 import 'package:a_green/aGreen/view/first_page_agreen.dart';
-import 'package:a_green/aGreen/view/home_page_agreen.dart';
 import 'package:a_green/aGreen/view/login_agreen.dart';
-import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 class RegisterAgreen extends StatefulWidget {
-  const RegisterAgreen({super.key});
+  final String user;
+  const RegisterAgreen({super.key, required this.user});
 
   @override
   State<RegisterAgreen> createState() => _RegisterAgreenState();
@@ -185,13 +183,13 @@ class _RegisterAgreenState extends State<RegisterAgreen> {
                     ),
                     onPressed: () async {
                       if (formKey.currentState!.validate()) {
-                        print('Register Success fpr ${emailController.text}');
+                        print('Register Success for ${emailController.text}');
 
                         //pindah ke halamamn home
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FirstPageAgreen(),
+                            builder: (context) => FirstPageAgreen(user: widget.user), //sampe sini
                           ),
                         );
                       }

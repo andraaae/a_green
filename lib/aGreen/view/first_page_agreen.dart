@@ -1,8 +1,11 @@
+import 'package:a_green/aGreen/bottom_navigation/buttom_navigation_agreen.dart';
+import 'package:a_green/aGreen/view/home_page_agreen.dart';
 import 'package:flutter/material.dart';
-
+import 'package:a_green/aGreen/models/user_model.dart';
 class FirstPageAgreen extends StatefulWidget {
-  const FirstPageAgreen({super.key});
-
+  final UserModel user;
+  const FirstPageAgreen({super.key, required this.user});
+  
   @override
   State<FirstPageAgreen> createState() => _FirstPageAgreenState();
 }
@@ -175,7 +178,7 @@ class _FirstPageAgreenState extends State<FirstPageAgreen> {
                       filled: true,
                       fillColor: Colors.white,
                     ),
-                    value: dropDownType,
+                    initialValue: dropDownType,
                     hint: Text(
                       'choose your plants type',
                       style: TextStyle(fontSize: 12, color: Color(0xff55695A)),
@@ -223,7 +226,7 @@ class _FirstPageAgreenState extends State<FirstPageAgreen> {
                       filled: true,
                       fillColor: Colors.white,
                     ),
-                    value: dropDownFrequency,
+                    initialValue: dropDownFrequency,
                     hint: Text(
                       '2 hari sekali',
                       style: TextStyle(fontSize: 12, color: Color(0xff55695A)),
@@ -254,7 +257,11 @@ class _FirstPageAgreenState extends State<FirstPageAgreen> {
                   SizedBox(height: 45),
                   SizedBox(width: double.infinity),
                   ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePageAgreen(user: widget.user)
+                      )
+                      );
+                    },
                     icon: SizedBox(),
                     label: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

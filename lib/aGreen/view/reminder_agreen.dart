@@ -9,6 +9,9 @@ class ReminderAgreen extends StatefulWidget {
 
 class _ReminderAgreenState extends State<ReminderAgreen> {
   bool isActive = false;
+  bool isOn = false;
+  int _selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +26,7 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
               SizedBox(height: 12),
               Text(
                 'Reminder',
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Color(0xff658C58)),
               ),
               SizedBox(height: 8),
               Text(
@@ -31,80 +34,150 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
                 style: TextStyle(fontSize: 15),
               ),
               SizedBox(height: 20),
-          //     Center(
-          //       child: Container(
-          //         padding: EdgeInsets.all(8),
-          //         width: double.infinity,
-          //         decoration: BoxDecoration(
-          //           color: Colors.white,
-          //           borderRadius: BorderRadius.circular(15),
-          //         ),
-          //         child: Container(
-          //           child: Row(
-          //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //             crossAxisAlignment: CrossAxisAlignment.center,
-          //           children: [
-          //             Icon(Icons.notifications),
-          //             Text('Automatic Notification'),
-          //             SizedBox(height: 5),
-          //             Text('Active', style: TextStyle(fontSize: 12,
-          //             ),
-          //           )
-          //         ],
-          //       ),
-          //     ),
-          //   ),
-          // ),
-    
-          //   Container(
-          //     child: Switch(value: isActive, onChanged: (value) {
-          //     setState(() {
-          //       isActive = value;
-          //     });
-          //     }
-          //     ),
-          //   )
-          Container( width: double.infinity,height: 50,
-            decoration: BoxDecoration(color: Colors.white),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Kiri: ikon + teks
-                  Row(
-                    children: [
-            Icon(Icons.notifications_none, color: Colors.green),
-            SizedBox(width: 10),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Notifikasi Otomatis',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+               Container(
+                width: double.infinity,
+                height: 70,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                Text(
-                  'Aktif',
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    Icon(
+                      isOn ? Icons.notifications_active : Icons.notifications_off,
+                      color: isOn ? Color(0xffABE7B2) : Color(0xffB7B89F),
+                    ),
+                    SizedBox(width: 12),
+
+                    /// TEXT COLUMN
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Notification',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text(
+                            isOn ? 'Active' : 'Inactive',
+                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    //switch
+                    Switch(
+                      value: isActive,
+                      onChanged: (value) {
+                        setState(() {
+                          isActive = value;
+                          isOn = value;
+                        });
+                      },
+                      inactiveThumbColor: Color(0xffA0C878),
+                      activeTrackColor: Color(0xffCBF3BB),
+                    ),
+                  ],
                 ),
-              ],
-            ), 
-            SizedBox(width: 100),
-            Switch(value: isActive, onChanged: (value){
-              setState(() {
-                isActive = value;
-              });
-            })
-                    ],
-                    ),
-                    ],
-                    ),
-          ), 
+              ),
+
+    //       Container( width: double.infinity,height: 50,
+    //         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+    //         child: Row(
+    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //             children: [
+    //               //icon + text
+    //               Row(
+    //                 children: [
+    //         Icon(isOn? Icons.notifications_active : Icons.notifications_off, 
+    //         color: isOn? Color(0xffABE7B2): Color(0xffB7B89F)), 
+    //         SizedBox(width: 10),
+    //         Column(
+    //           mainAxisAlignment: MainAxisAlignment.center,
+    //           crossAxisAlignment: CrossAxisAlignment.start,
+    //           children: [
+    //             Text(
+    //               'Notification',
+    //               style: TextStyle(fontWeight: FontWeight.bold),
+    //             ),
+    //             Text(
+    //               'Active',
+    //               style: TextStyle(color: Colors.grey, fontSize: 12),
+    //             ),
+    //           ],
+    //         ), 
+    //         SizedBox(width: 100),
+    //         Switch(value: isActive, onChanged: (value){
+    //           setState(() {
+    //             isActive = value;
+    //             isOn = value;
+    //           });
+    //         },
+    //         inactiveThumbColor: Color(0xffA0C878),
+    //         activeTrackColor: Color(0xffCBF3BB),
+    //         )
+    //       ],
+    //      ),
+    //     ],
+    //   ),
+    // ), 
           SizedBox(height: 40),
-          Text('Upcoming Schedule', style: TextStyle(fontSize: 15),)
-        ],
+          Text('Upcoming Schedule', style: TextStyle(fontSize: 15)),
+          SizedBox(height: 12),
+          Container(
+             padding: EdgeInsets.all(8),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadiusGeometry.circular(12),
+                        child: Image.asset(
+                          'assets/images/orchid.jpg',
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Oci the Orchid",
+                              style: TextStyle(fontSize: 15),
+                            ),
+                            Text("Orchid", style: TextStyle(fontSize: 13)),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Icon(Icons.alarm),
+                                 Text(
+                                "2 days left",
+                                style: TextStyle(fontSize: 13)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),  
+          ),
+          
         ),
-        ),
-      ),
-    );  
+       
+      );  
+    }
   }
-}
