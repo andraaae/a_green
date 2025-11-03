@@ -1,10 +1,13 @@
+import 'package:a_green/aGreen/database/db_helper.dart';
+import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:a_green/aGreen/view/first_page_agreen.dart';
 import 'package:a_green/aGreen/view/login_agreen.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class RegisterAgreen extends StatefulWidget {
-  final String user;
-  const RegisterAgreen({super.key, required this.user});
+  // final UserModel user;
+  const RegisterAgreen({super.key});
 
   @override
   State<RegisterAgreen> createState() => _RegisterAgreenState();
@@ -184,12 +187,22 @@ class _RegisterAgreenState extends State<RegisterAgreen> {
                     onPressed: () async {
                       if (formKey.currentState!.validate()) {
                         print('Register Success for ${emailController.text}');
-
+                        print(emailController.text);
+                        final UserModel data = UserModel(
+                          email: emailController.text,
+                          username: nameController.text,
+                          password: passwordController.text,
+                          phone: phoneController.text,
+                          address: "",
+                        );
+                        DbHelper.registerUser(data);
+                        Fluttertoast.showToast(msg: "Register Berhasil");
                         //pindah ke halamamn home
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FirstPageAgreen(user: widget.user), //sampe sini
+                            builder: (context) =>
+                                LoginAgreen(), //sampe sini
                           ),
                         );
                       }

@@ -1,9 +1,10 @@
+import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:a_green/aGreen/view/register_agreen.dart';
 import 'package:flutter/material.dart';
 
 class WelcomePage extends StatefulWidget {
-  final String user;
-  const WelcomePage({super.key, required this.user});
+  // final UserModel user;
+  const WelcomePage({super.key});
 
   @override
   State<WelcomePage> createState() => _WelcomePageState();
@@ -37,7 +38,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => RegisterAgreen(user: widget.user)),
+                    MaterialPageRoute(builder: (context) => RegisterAgreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(

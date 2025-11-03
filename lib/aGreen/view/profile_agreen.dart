@@ -80,7 +80,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
               Text('Setting', style: TextStyle(fontSize: 16)),
               SizedBox(height: 18),
 
-              /// theme
+              /// tema
               Container(
                 width: double.infinity,
                 height: 70,

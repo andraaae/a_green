@@ -7,8 +7,7 @@ import 'package:a_green/aGreen/view/reminder_agreen.dart';
 import 'package:flutter/material.dart';
 
 class ButtomNavigationAgreen extends StatefulWidget {
-  final String user;
-  const ButtomNavigationAgreen({super.key, required this.user});
+  const ButtomNavigationAgreen({super.key});
   
   @override
   State<ButtomNavigationAgreen> createState() => _ButtomNavigationAgreenState();
@@ -21,7 +20,7 @@ class _ButtomNavigationAgreenState extends State<ButtomNavigationAgreen> {
   void initState() {
     super.initState();
     _pages = [
-      HomePageAgreen(user: widget.user),
+      HomePageAgreen(), //sampe sini
       ReminderAgreen(),
       const SizedBox(), // kosong untuk posisi tombol add
       JournalPageAgreen(),
@@ -39,7 +38,7 @@ class _ButtomNavigationAgreenState extends State<ButtomNavigationAgreen> {
           onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddPlantsAgreen(user: widget.user)),
+            MaterialPageRoute(builder: (context) => AddPlantsAgreen()),
             );
         },
         child: const Icon(Icons.add, size: 30),

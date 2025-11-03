@@ -1,3 +1,5 @@
+import 'package:a_green/aGreen/database/preferrence.dart';
+import 'package:a_green/aGreen/models/plant_model.dart';
 import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -12,38 +14,35 @@ class DbHelper {
     final dbPath = await getDatabasesPath();
     return openDatabase(
       join(dbPath, _dbName),
-    
+
       onCreate: (db, version) async {
         await db.execute(
-          "CREATE TABLE $tableUser(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, email TEXT, password TEXT, phone TEXT)",
+          "CREATE TABLE $tableUser(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, email TEXT, password TEXT, phone TEXT, address TEXT)",
         );
         print("Table $tableUser created succesfully");
 
         await db.execute(
-          "CREATE TABLE $tablePlants("  // 🆕 buat tabel plant
-          "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-          "name TEXT, plant TEXT, status TEXT)"
+          "CREATE TABLE $tablePlants(" // buat tabel plant
+          "id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, plant TEXT, status TEXT, frequency TEXT, userId INTEGER NOT NULL)",
         );
+        print("Table $tablePlants created succesfully");
+      },
 
-      },
-      
       onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 2) {
-          await db.execute(
-            "ALTER TABLE $tableUser(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, email TEXT, password TEXT )",
-          );
-          print("Column 'address' added to $tableUser");
-        }
-        if (oldVersion < 3) {
-          await db.execute("ALTER TABLE $tableUser ADD COLUMN address TEXT");
-          print("Column 'address' added to $tableUser");
-        }
+        // if (oldVersion < 2) {
+        //   await db.execute(
+        //     "ALTER TABLE $tableUser(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, email TEXT, password TEXT )",
+        //   );
+        //   print("Column 'address' added to $tableUser");
+        // }
+        // if (oldVersion < 3) {
+        //   await db.execute("ALTER TABLE $tableUser ADD COLUMN address TEXT");
+        //   print("Column 'address' added to $tableUser");
+        // }
       },
-      version: 3,
+      version: 1,
     );
   }
-
-  
 
   //register user
   static Future<void> registerUser(UserModel user) async {
@@ -76,6 +75,8 @@ class DbHelper {
     );
     print('Login query result: $results');
     if (results.isNotEmpty) {
+      final dataUser = UserModel.fromMap(results.first);
+      PreferenceHandler.saveId(dataUser.id!);
       return UserModel.fromMap(results.first);
     }
     return null;
@@ -122,38 +123,49 @@ class DbHelper {
     await dbs.delete(tableUser, where: "id = ?", whereArgs: [id]);
     print("user $id deleted");
   }
-   // Add Plant
-  static Future<void> addPlant(Map<String, dynamic> plant) async {
+
+  // Add Plant
+  static Future<void> addPlant(PlantModel plant) async {
     final dbInstance = await db();
     await dbInstance.insert(
       tablePlants,
-      plant,
+      plant.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
     print("Plant added: $plant");
   }
 
   // Get plants by userId
-  static Future<List<Map<String, dynamic>>> getPlantsByUser(int userId) async {
+  static Future<List<PlantModel>> getPlantsByUser(int userId) async {
     final dbInstance = await db();
-    return await dbInstance.query(
+
+    final List<Map<String, dynamic>> results = await dbInstance.query(
       tablePlants,
-      where: 'userId = ?',
+      where: 'id = ?',
       whereArgs: [userId],
     );
+    print(results.map((e) => PlantModel.fromMap(e)).toList());
+    return results.map((e) => PlantModel.fromMap(e)).toList();
+  }
+
+  static Future<UserModel?> getUser(int userId) async {
+    final dbInstance = await db();
+    final List<Map<String, dynamic>> results = await dbInstance.query(
+      tableUser,
+      where: 'id = ?',
+      whereArgs: [userId],
+    );
+    print(results);
+    if (results.isNotEmpty) {
+      return UserModel.fromMap(results.first);
+    }
+    return null;
   }
 
   // Delete plant by id
   static Future<void> deletePlant(int id) async {
     final dbInstance = await db();
-    await dbInstance.delete(
-      tablePlants,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await dbInstance.delete(tablePlants, where: 'id = ?', whereArgs: [id]);
     print("Plant $id deleted");
   }
 }
-
-
-

@@ -1,18 +1,20 @@
 import 'package:a_green/aGreen/bottom_navigation/buttom_navigation_agreen.dart';
+import 'package:a_green/aGreen/database/db_helper.dart';
+import 'package:a_green/aGreen/models/plant_model.dart';
+import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:a_green/aGreen/view/home_page_agreen.dart';
 import 'package:a_green/aGreen/view/journal_page_agreen.dart';
 import 'package:flutter/material.dart';
 
 class AddPlantsAgreen extends StatefulWidget {
-  final String user;
-  const AddPlantsAgreen({super.key, required this.user});
+  const AddPlantsAgreen({super.key});
 
   @override
   State<AddPlantsAgreen> createState() => _AddPlantsAgreenState();
 }
 
 class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
-   final formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
   final plantname = TextEditingController();
   String? dropDownType;
   String? dropDownFrequency;
@@ -102,7 +104,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    backgroundColor: const Color(0xffCBF3BB),
+      backgroundColor: const Color(0xffCBF3BB),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -258,10 +260,18 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                   SizedBox(width: double.infinity),
                   ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ButtomNavigationAgreen(user: widget.user)),
-            );
+                      final PlantModel data = PlantModel(
+                        name: plantname.text,
+                        frequency: dropDownFrequency.toString(),
+                        plant: dropDownType.toString(),
+                        status: "",
+                      );
+                      DbHelper.addPlant(data);
+                      Navigator.of(context).pop();
+                      //           Navigator.push(
+                      // context,
+                      // MaterialPageRoute(builder: (context) => ButtomNavigationAgreen(user: widget.user)),
+                      // );
                     },
                     icon: SizedBox(),
                     label: Row(
@@ -272,8 +282,6 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                           'Save',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-
-                        
                       ],
                     ),
                     style: ElevatedButton.styleFrom(

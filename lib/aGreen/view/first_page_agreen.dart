@@ -1,11 +1,12 @@
 import 'package:a_green/aGreen/bottom_navigation/buttom_navigation_agreen.dart';
 import 'package:a_green/aGreen/view/home_page_agreen.dart';
+import 'package:a_green/aGreen/view/login_agreen.dart';
 import 'package:flutter/material.dart';
 import 'package:a_green/aGreen/models/user_model.dart';
+
 class FirstPageAgreen extends StatefulWidget {
-  final UserModel user;
-  const FirstPageAgreen({super.key, required this.user});
-  
+  const FirstPageAgreen({super.key});
+
   @override
   State<FirstPageAgreen> createState() => _FirstPageAgreenState();
 }
@@ -258,8 +259,9 @@ class _FirstPageAgreenState extends State<FirstPageAgreen> {
                   SizedBox(width: double.infinity),
                   ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePageAgreen(user: widget.user)
-                      )
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginAgreen()),
                       );
                     },
                     icon: SizedBox(),
@@ -293,7 +295,10 @@ class _FirstPageAgreenState extends State<FirstPageAgreen> {
 
                   TextButton(
                     onPressed: () {
-                      print('Skip for now');
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginAgreen()),
+                      );
                     },
                     child: Text(
                       'Skip for now',

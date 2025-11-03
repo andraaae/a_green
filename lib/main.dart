@@ -6,6 +6,7 @@ import 'package:a_green/aGreen/view/journal_page_agreen.dart';
 import 'package:a_green/aGreen/view/profile_agreen.dart';
 import 'package:a_green/aGreen/view/register_agreen.dart';
 import 'package:a_green/aGreen/view/reminder_agreen.dart';
+import 'package:a_green/aGreen/view/welcome_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: RegisterAgreen(user: 'user',),
+      home: WelcomePage( ),
     );
   }
 }
