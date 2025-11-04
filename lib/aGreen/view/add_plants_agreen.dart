@@ -1,5 +1,6 @@
 import 'package:a_green/aGreen/bottom_navigation/buttom_navigation_agreen.dart';
 import 'package:a_green/aGreen/database/db_helper.dart';
+import 'package:a_green/aGreen/database/preferrence.dart';
 import 'package:a_green/aGreen/models/plant_model.dart';
 import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:a_green/aGreen/view/home_page_agreen.dart';
@@ -258,14 +259,31 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                   SizedBox(height: 45),
                   SizedBox(width: double.infinity),
                   ElevatedButton.icon(
-                    onPressed: () {
-                      final PlantModel data = PlantModel(
+                    onPressed: () async {
+                       try {
+                          final newPlant= PlantModel(
+                        userId: userId,
                         name: plantname.text,
                         frequency: dropDownFrequency.toString(),
                         plant: dropDownType.toString(),
                         status: "",
                       );
-                      DbHelper.addPlant(data);
+                       final result = await DbHelper.addPlant(data);
+
+                       if (result > 0) {
+                         print('Plant added successfully!');
+                         Navigator.of(context).pop();
+                       } else {
+                        // SAMPE SINI.
+                       }
+                       }
+                      //  final newPlant= PlantModel(
+                      //   userId: userId,
+                      //   name: plantname.text,
+                      //   frequency: dropDownFrequency.toString(),
+                      //   plant: dropDownType.toString(),
+                      //   status: "",
+                      // );
                       Navigator.of(context).pop();
                       //           Navigator.push(
                       // context,

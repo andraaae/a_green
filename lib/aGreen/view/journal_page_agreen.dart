@@ -92,7 +92,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text('0', style: TextStyle(fontSize: 20)),
+                      Text("Frequency:", style: TextStyle(fontSize: 20)), //buntu
                       SizedBox(height: 20),
                       Text('Watered this week', style: TextStyle(fontSize: 10)),
                     ],

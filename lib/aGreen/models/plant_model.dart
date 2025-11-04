@@ -3,6 +3,7 @@ import 'dart:convert';
 
 class PlantModel {
   int? id;
+  int? userId;
   final String name;
   final String plant;
   final String status;
@@ -10,6 +11,7 @@ class PlantModel {
 
   PlantModel({
     this.id,
+    this.userId,
     required this.name,
     required this.plant,
     required this.status,
