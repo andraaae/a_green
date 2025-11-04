@@ -1,8 +1,10 @@
 import 'package:a_green/aGreen/bottom_navigation/buttom_navigation_agreen.dart';
 import 'package:a_green/aGreen/view/about_agreen.dart';
 import 'package:a_green/aGreen/view/add_plants_agreen.dart';
+import 'package:a_green/aGreen/view/first_page_agreen.dart';
 import 'package:a_green/aGreen/view/home_page_agreen.dart';
 import 'package:a_green/aGreen/view/journal_page_agreen.dart';
+import 'package:a_green/aGreen/view/login_agreen.dart';
 import 'package:a_green/aGreen/view/profile_agreen.dart';
 import 'package:a_green/aGreen/view/register_agreen.dart';
 import 'package:a_green/aGreen/view/reminder_agreen.dart';
@@ -39,7 +41,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: WelcomePage( ),
+      home: LoginAgreen(),
     );
   }
 }

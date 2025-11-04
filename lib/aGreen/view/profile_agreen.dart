@@ -1,3 +1,6 @@
+import 'package:a_green/aGreen/database/db_helper.dart';
+import 'package:a_green/aGreen/database/preferrence.dart';
+import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:a_green/aGreen/view/about_agreen.dart';
 import 'package:flutter/material.dart';
 
@@ -9,11 +12,27 @@ class ProfileAgreen extends StatefulWidget {
 }
 
 class _ProfileAgreenState extends State<ProfileAgreen> {
+  UserModel? dataUser;
   int _selectedIndex = 0;
   bool isSounding = false; //notif
   bool isActive = false; //tema
-  
-  
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+  Future<void> getData() async {
+    var id = await PreferenceHandler.getId();
+    if (id != null) {
+      UserModel? result = await DbHelper.getUser(id);
+
+      setState(() {
+        dataUser = result;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +49,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
               //header
               Row(
                 children: [
-                  Text(
-                    'Profile',
-                    style: TextStyle(fontSize: 19),
-                  ),
+                  Text('Profile', style: TextStyle(fontSize: 19)),
                   SizedBox(width: 6),
                   Icon(Icons.person, color: Color(0xff777C6D)),
                 ],
@@ -56,16 +72,22 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                       CircleAvatar(
                         radius: 45,
                         backgroundColor: Color(0xffB9D4AA),
-                        child: Text('A', style: TextStyle(fontSize: 25)),
+                        child: Text(
+                          '${dataUser?.username ?? ""}',
+                          style: TextStyle(fontSize: 25),
+                        ),
                       ),
                       SizedBox(width: 20),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('and', style: TextStyle(fontSize: 20)),
                           Text(
-                            'andrariedwan@gmail.com',
+                            '${dataUser?.username ?? ""}',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          Text(
+                            '${dataUser?.email ?? ""}',
                             style: TextStyle(fontSize: 16, color: Colors.grey),
                           ),
                         ],
@@ -101,8 +123,10 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Theme',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text(
+                            'Theme',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                           Text(
                             isActive ? 'Dark Mode' : 'Light Mode',
                             style: TextStyle(color: Colors.grey, fontSize: 12),
@@ -138,7 +162,9 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                 child: Row(
                   children: [
                     Icon(
-                      isSounding ? Icons.notifications_active : Icons.notifications_off,
+                      isSounding
+                          ? Icons.notifications_active
+                          : Icons.notifications_off,
                       color: isSounding ? Color(0xffABE7B2) : Color(0xffB7B89F),
                     ),
                     SizedBox(width: 12),
@@ -147,10 +173,14 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Notification',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
                           Text(
-                            isSounding ? "Notification's on" : "Notification's off",
+                            'Notification',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            isSounding
+                                ? "Notification's on"
+                                : "Notification's off",
                             style: TextStyle(color: Colors.grey, fontSize: 12),
                           ),
                         ],
@@ -169,62 +199,63 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                     ),
                   ],
                 ),
-              ), 
+              ),
               SizedBox(height: 18),
-              Divider(
-                color: Colors.green.shade200,
-                thickness: 1,
-                height: 30,
-              ),
+              Divider(color: Colors.green.shade200, thickness: 1, height: 30),
 
-            //  about aGreen
-            SizedBox(height: 30),
-            Center(
-            child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            ),
-            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-            elevation: 0,
-            minimumSize: Size(double.infinity, 0),
-            ),
-            onPressed: () {
-              Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AboutAgreen()),
-            );
-            },
-            child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-            Icon(Icons.info,
-            color: Color(0xffCBF3BB)),
+              //  about aGreen
+              SizedBox(height: 30),
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    elevation: 0,
+                    minimumSize: Size(double.infinity, 0),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AboutAgreen()),
+                    );
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(Icons.info, color: Color(0xffCBF3BB)),
 
-
-            SizedBox(width: 16),
-            Expanded(
-            child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'About aGreen',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'About aGreen',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Version 1.0.0',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              SizedBox(height: 4),
-              Text(
-                'Version 1.0.0',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  ),
-),
             ],
           ),
         ),

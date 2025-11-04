@@ -21,52 +21,40 @@ class _AboutAgreenState extends State<AboutAgreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Icon(
-                Icons.eco,
-                size: 80,
-                color:  Color(0xff94BF9E),
-              ),
-            ),
-             SizedBox(height: 16),
-             Text(
+            Center(child: Icon(Icons.eco, size: 80, color: Color(0xff94BF9E))),
+            SizedBox(height: 16),
+            Text(
               'aGreen is your plant care partner — helping you grow and care for your green friends with confidence and ease. 🌱',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 18, height: 1.5),
             ),
-             SizedBox(height: 20),
-             Divider(thickness: 1.2),
-             SizedBox(height: 12),
-             Text(
+            SizedBox(height: 20),
+            Divider(thickness: 1.2),
+            SizedBox(height: 12),
+            Text(
               '🌿 Key Features:',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
-             SizedBox(height: 8),
-             Text(
-              '• Get personalized care reminders'
+            SizedBox(height: 8),
+            Text(
+              '• Get personalized care reminders\n'
               '• Track plant growth with a built-in journal\n'
               '• Receive simple and helpful plant tips',
               style: TextStyle(fontSize: 16, height: 1.6),
             ),
-             Spacer(),
-             Divider(thickness: 1.2),
-             SizedBox(height: 8),
-             Text(
+            Spacer(),
+            Divider(thickness: 1.2),
+            SizedBox(height: 8),
+            Text(
               'Version: 1.0.0\n'
               'Developed by: and\n'
               'Contact: agreen.support@gmail.com',
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
-             SizedBox(height: 12),
+            SizedBox(height: 12),
           ],
         ),
       ),
-      );
-    
-
-    
+    );
   }
 }

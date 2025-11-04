@@ -1,3 +1,6 @@
+import 'package:a_green/aGreen/database/db_helper.dart';
+import 'package:a_green/aGreen/database/preferrence.dart';
+import 'package:a_green/aGreen/models/plant_model.dart';
 import 'package:flutter/material.dart';
 
 class ReminderAgreen extends StatefulWidget {
@@ -8,9 +11,29 @@ class ReminderAgreen extends StatefulWidget {
 }
 
 class _ReminderAgreenState extends State<ReminderAgreen> {
+  List<PlantModel>? userPlants = [];
   bool isActive = false;
   bool isOn = false;
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    getReminderData();
+  }
+
+  Future<void> getReminderData() async {
+    var id = await PreferenceHandler.getId();
+    print(id);
+    if (id != null) {
+      List<PlantModel> plantsData = await DbHelper.getPlantsByUser(id);
+      print("Loaded reminderPlants: $plantsData");
+      setState(() {
+        userPlants = plantsData;
+      });
+    }
+    return; // keluar dari fungsi
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,6 +169,7 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadiusGeometry.circular(12),
+
                       // child: Image.asset(
                       //   'assets/images/orchid.jpg',
                       //   width: 60,
@@ -153,31 +177,34 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
                       //   fit: BoxFit.cover,
                       // ),
                     ),
-                    //
-                    // SizedBox(width: 12),
-                    // Expanded(
-                    //   child: Column(
-                    //     mainAxisAlignment: MainAxisAlignment.center,
-                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                    //     children: [
-                    //       Text(
-                    //         "Oci the Orchid",
-                    //         style: TextStyle(fontSize: 15),
-                    //       ),
-                    //       Text("Orchid", style: TextStyle(fontSize: 13)),
-                    //       Row(
-                    //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //         children: [
-                    //           Icon(Icons.alarm),
-                    //           Text(
-                    //             "2 days left",
-                    //             style: TextStyle(fontSize: 13),
-                    //           ),
-                    //         ],
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
+
+                    //BUNTU GUE
+                    SizedBox(height: 20),
+                    userPlants == null
+                        ? CircularProgressIndicator()
+                        : Expanded(
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: userPlants?.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final data = userPlants![index];
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${data.name}',
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text('${data.plant}'),
+                                    SizedBox(height: 10),
+                                    Text('${data.frequency}'),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
                   ],
                 ),
               ),

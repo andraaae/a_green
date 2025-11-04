@@ -1,3 +1,7 @@
+import 'package:a_green/aGreen/database/db_helper.dart';
+import 'package:a_green/aGreen/database/preferrence.dart';
+import 'package:a_green/aGreen/models/plant_model.dart';
+import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 class JournalPageAgreen extends StatefulWidget {
@@ -8,7 +12,29 @@ class JournalPageAgreen extends StatefulWidget {
 }
 
 class _JournalPageAgreenState extends State<JournalPageAgreen> {
-  
+  int selectedIndex = 0;
+  UserModel? dataUser;
+  List<PlantModel>? userPlants = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+  Future<void> getData() async {
+    var id = await PreferenceHandler.getId();
+    if (id != null) {
+      UserModel? result = await DbHelper.getUser(id);
+      List<PlantModel> plantsData = await DbHelper.getPlantsByUser(id);
+
+      setState(() {
+        dataUser = result;
+        userPlants = plantsData;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +72,10 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text('1', style: TextStyle(fontSize: 20)),
+                      Text(
+                        userPlants?.length.toString() ?? "0",
+                        style: TextStyle(fontSize: 20),
+                      ),
                       SizedBox(height: 20),
                       Text('Plants total', style: TextStyle(fontSize: 10)),
                     ],
@@ -127,26 +156,52 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                       //   fit: BoxFit.cover,
                       // ),
                     ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Joel", style: TextStyle(fontSize: 15)),
-                          SizedBox(height: 6),
-                          Text(
-                            "25 November 2026",
-                            style: TextStyle(fontSize: 13),
+                    SizedBox(height: 5),
+                    userPlants == null
+                        ? CircularProgressIndicator()
+                        : Expanded(
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: userPlants?.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final data = userPlants![index];
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${data.name}', //sampe sini
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text('${data.plant}'),
+                                    SizedBox(height: 10),
+                                    Text('${data.frequency}'),
+                                    // SizedBox(width: 12),
+                                    // Expanded(
+                                    //   child: Column(
+                                    //     mainAxisAlignment: MainAxisAlignment.center,
+                                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                                    //     children: [
+                                    //       Text("Joel", style: TextStyle(fontSize: 15)),
+                                    //       SizedBox(height: 6),
+                                    //       Text(
+                                    //         "25 November 2026",
+                                    //         style: TextStyle(fontSize: 13),
+                                    //       ),
+                                    //       SizedBox(height: 6),
+                                    //       Text(
+                                    //         "Joel has joined to your family! yippie",
+                                    //         style: TextStyle(fontSize: 15),
+                                    //       ),
+                                    //     ],
+                                    //   ),
+                                    // ),
+                                  ],
+                                );
+                              },
+                            ),
                           ),
-                          SizedBox(height: 6),
-                          Text(
-                            "Joel has joined to your family! yippie",
-                            style: TextStyle(fontSize: 15),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ),

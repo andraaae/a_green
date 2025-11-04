@@ -3,10 +3,10 @@ import 'dart:convert';
 
 class PlantModel {
   int? id;
-  String name;
-  String plant;
-  String status;
-  String frequency;
+  final String name;
+  final String plant;
+  final String status;
+  final String frequency;
 
   PlantModel({
     this.id,

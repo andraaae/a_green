@@ -188,7 +188,6 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                     items: typeitems.map((String item) {
                       return DropdownMenuItem<String>(
                         value: item,
-
                         child: Text(item),
                       );
                     }).toList(),
