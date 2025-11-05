@@ -137,7 +137,7 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                 'Your plant(s)',
                 style: TextStyle(fontSize: 16, color: Color(0xff819067)),
               ),
-              SizedBox(height: 14),
+              SizedBox(height: 20),
               Center(
                 child: Container(
                   padding: EdgeInsets.all(8),
@@ -159,13 +159,13 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                             return ListTile(
                               title: Text(
                                 '${data.name}',
-                                style: TextStyle(fontSize: 18),
+                                style: TextStyle(fontSize: 18, color: Color(0xff748873)),
                               ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('${data.plant}'),
-                                  Text('Water: ${data.frequency}'),
+                                  Text('${data.plant}', style: TextStyle(color: Color(0xff748873)),),
+                                  Text('Water: ${data.frequency}', style: TextStyle(color: Color(0xff748873)),),
                                   LinearProgressIndicator(
                                     borderRadius: BorderRadius.circular(11),
                                     backgroundColor: Color(0x80A6AD88),

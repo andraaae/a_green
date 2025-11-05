@@ -37,17 +37,42 @@ class _SplashScreenState extends State<SplashScreen> {
     });
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Center(
-           // child: ,
-          )
-        ],
+      backgroundColor: const Color(0xffCBF3BB), // warna hijau soft misal
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            /// Icon/logo di tengah
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.eco,  // ganti icon sesuai yang kamu mau
+                size: 70,
+                color: Color(0xff7BAE7F),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// Nama aplikasi (opsional)
+            const Text(
+              "aGreen",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

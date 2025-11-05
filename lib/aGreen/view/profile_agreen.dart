@@ -118,8 +118,8 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                 child: Row(
                   children: [
                     Icon(
-                      isOn ? Icons.dark_mode : Icons.sunny,
-                      color: isOn ? Color(0xffABE7B2) : Color(0xffB7B89F),
+                      themeProvider.isDarkMode ? Icons.dark_mode : Icons.sunny,
+                      color: themeProvider.isDarkMode ? Color(0xffB7B89F) : Color(0xffABE7B2),
                     ),
                     SizedBox(width: 12),
                     Expanded(
@@ -135,7 +135,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                             ),
                           ),
                           Text(
-                            isOn ? 'Dark Mode' : 'Light Mode',
+                            themeProvider.isDarkMode ? 'Dark Mode' : 'Light Mode',
                             style: TextStyle(color: Colors.grey, fontSize: 12),
                           ),
                         ],
@@ -263,13 +263,14 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 50),
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
                     elevation: 0,
+                    minimumSize: Size(500, 50),
                     side: BorderSide(color: Colors.red),
                   ),
                   onPressed: () {
@@ -280,7 +281,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                   },
                   child: Text(
                     "Logout",
-                    style: TextStyle(color: Colors.black, fontSize: 13),
+                    style: TextStyle(color: Colors.red, fontSize: 13),
                   ),
                 ),
               ),
