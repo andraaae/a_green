@@ -235,9 +235,8 @@ class _LoginAgreenState extends State<LoginAgreen> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => RegisterAgreen(
-                              
-                              ), //sampe sini
+                              builder: (context) =>
+                                  RegisterAgreen(), //sampe sini
                             ),
                           );
                           print('Register now');
