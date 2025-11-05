@@ -1,10 +1,6 @@
-import 'package:a_green/aGreen/bottom_navigation/buttom_navigation_agreen.dart';
 import 'package:a_green/aGreen/database/db_helper.dart';
 import 'package:a_green/aGreen/database/preferrence.dart';
 import 'package:a_green/aGreen/models/plant_model.dart';
-import 'package:a_green/aGreen/models/user_model.dart';
-import 'package:a_green/aGreen/view/home_page_agreen.dart';
-import 'package:a_green/aGreen/view/journal_page_agreen.dart';
 import 'package:flutter/material.dart';
 
 class AddPlantsAgreen extends StatefulWidget {
@@ -19,6 +15,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
   final plantname = TextEditingController();
   String? dropDownType;
   String? dropDownFrequency;
+
   final List<String> typeitems = [
     "Monstera",
     "Calathea",
@@ -94,6 +91,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
     "Croton",
     "Hydrocotyle verticillata",
   ];
+
   final List<String> frequencyitem = [
     "1-2 minggu",
     "2-3 hari sekali",
@@ -101,7 +99,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
     "2 hari sekali",
     "setiap hari",
   ];
-  bool isButtonEnable = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,211 +110,164 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
           padding: const EdgeInsets.all(8.0),
           child: Form(
             key: formKey,
-            child: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 40),
-                  const Center(
-                    child: Text(
-                      'Add New Plants',
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xffA3CFA2),
-                      ),
-                    ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 40),
+                const Text(
+                  'Add New Plants',
+                  style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xffA3CFA2),
                   ),
-                  SizedBox(height: 15),
-                  Text(
-                    "Fill in the details of your new plant",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Color(0xff96A78D)),
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Text(
-                        "Plants name",
-                        style: TextStyle(color: Color(0xff55695A)),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 7),
-                  TextFormField(
-                    controller: plantname,
-                    decoration: InputDecoration(
-                      isDense: true,
-                      hintText: "ex. Pisi de Lily",
-                      hintStyle: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xff55695A),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                  ),
+                ),
+                SizedBox(height: 15),
+                Text(
+                  "Fill in the details of your new plant",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Color(0xff96A78D)),
+                ),
+                SizedBox(height: 20),
 
-                  //type
-                  SizedBox(height: 30),
-                  Row(
-                    children: [
-                      Text(
-                        "Type of plant",
-                        style: TextStyle(color: Color(0xff55695A)),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 7),
-                  DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      isDense: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
+                /// PLANT NAME
+                Row(
+                  children: [
+                    Text(
+                      "Plants name",
+                      style: TextStyle(color: Color(0xff55695A)),
                     ),
-                    initialValue: dropDownType,
-                    hint: Text(
-                      'choose your plants type',
-                      style: TextStyle(fontSize: 12, color: Color(0xff55695A)),
+                  ],
+                ),
+                SizedBox(height: 7),
+                TextFormField(
+                  controller: plantname,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "Required" : null,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    hintText: "ex. Peace Lily",
+                    hintStyle: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xff55695A),
                     ),
-                    items: typeitems.map((String item) {
-                      return DropdownMenuItem<String>(
-                        value: item,
-                        child: Text(item),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        dropDownType = value;
-                      });
-                      print(dropDownType);
-                    },
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      dropDownType != null ? Text(dropDownType!) : SizedBox(),
-                    ],
-                  ),
+                ),
 
-                  //frequency
-                  SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Text(
-                        "Watering Frequency",
-                        style: TextStyle(color: Color(0xff55695A)),
-                      ),
-                    ],
+                /// TYPE OF PLANT
+                SizedBox(height: 30),
+                Row(
+                  children: [
+                    Text(
+                      "Type of plant",
+                      style: TextStyle(color: Color(0xff55695A)),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 7),
+                DropdownButtonFormField<String>(
+                  hint: Text(
+                    'choose your plant type',
+                    style: TextStyle(fontSize: 12),
                   ),
-                  SizedBox(height: 7),
-                  DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      isDense: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    initialValue: dropDownFrequency,
-                    hint: Text(
-                      '2 hari sekali',
-                      style: TextStyle(fontSize: 12, color: Color(0xff55695A)),
-                    ),
-                    items: frequencyitem.map((String item) {
-                      return DropdownMenuItem<String>(
-                        value: item,
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  validator: (value) => value == null ? "Select one" : null,
+                  items: typeitems.map((String item) {
+                    return DropdownMenuItem<String>(
+                      value: item,
+                      child: Text(item),
+                    );
+                  }).toList(),
+                  onChanged: (value) => dropDownType = value,
+                ),
 
-                        child: Text(item),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        dropDownFrequency = value;
-                      });
-                      print(dropDownFrequency);
-                    },
+                /// FREQUENCY
+                SizedBox(height: 30),
+                Row(
+                  children: [
+                    Text(
+                      "Watering Frequency",
+                      style: TextStyle(color: Color(0xff55695A)),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 7),
+                DropdownButtonFormField<String>(
+                  hint: Text('2-3 hari sekali', style: TextStyle(fontSize: 12)),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      dropDownFrequency != null
-                          ? Text(dropDownFrequency!)
-                          : SizedBox(),
-                    ],
-                  ),
-                  SizedBox(height: 45),
-                  SizedBox(width: double.infinity),
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                       try {
-                          final newPlant= PlantModel(
-                        userId: userId,
-                        name: plantname.text,
-                        frequency: dropDownFrequency.toString(),
-                        plant: dropDownType.toString(),
-                        status: "",
-                      );
-                       final result = await DbHelper.addPlant(data);
+                  validator: (value) => value == null ? "Select one" : null,
+                  items: frequencyitem.map((String item) {
+                    return DropdownMenuItem<String>(
+                      value: item,
+                      child: Text(item),
+                    );
+                  }).toList(),
+                  onChanged: (value) => dropDownFrequency = value,
+                ),
 
-                       if (result > 0) {
-                         print('Plant added successfully!');
-                         Navigator.of(context).pop();
-                       } else {
-                        // SAMPE SINI.
-                       }
-                       }
-                      //  final newPlant= PlantModel(
-                      //   userId: userId,
-                      //   name: plantname.text,
-                      //   frequency: dropDownFrequency.toString(),
-                      //   plant: dropDownType.toString(),
-                      //   status: "",
-                      // );
-                      Navigator.of(context).pop();
-                      //           Navigator.push(
-                      // context,
-                      // MaterialPageRoute(builder: (context) => ButtomNavigationAgreen(user: widget.user)),
-                      // );
-                    },
-                    icon: SizedBox(),
-                    label: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Save',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                SizedBox(height: 45),
+
+                /// SAVE BUTTON
+                ElevatedButton(
+                  onPressed: () async {
+                    if (!formKey.currentState!.validate()) return;
+
+                    final int? userId = await PreferenceHandler.getId();
+                    if (userId == null) {
+                      print("User ID not found, please login again");
+                      return;
+                    }
+
+                    final PlantModel data = PlantModel(
+                      userId: userId,
+                      name: plantname.text.trim(),
+                      plant: dropDownType!,
+                      frequency: dropDownFrequency!,
+                      status: "Active",
+                    );
+
+                    print("DEBUG INSERT: ${data.toMap()}");
+
+                    await DbHelper.addPlant(data);
+
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xffB3E2A7),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 120,
+                      vertical: 10,
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isButtonEnable
-                          ? const Color(0xffB3E2A7)
-                          : Color(0xffB3E2A7),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 120,
-                        vertical: 10,
-                      ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                ],
-              ),
+                  child: const Text(
+                    'Save',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

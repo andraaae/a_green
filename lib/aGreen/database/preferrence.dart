@@ -5,7 +5,7 @@ class PreferenceHandler {
   static const String isLogin = "isLogin";
   static const String isId = "isId";
   static const String plantList = "plantList";
- 
+
   //Save data login pada saat login
 
   static saveLogin(bool value) async {

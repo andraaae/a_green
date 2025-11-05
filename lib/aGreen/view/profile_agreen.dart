@@ -2,7 +2,10 @@ import 'package:a_green/aGreen/database/db_helper.dart';
 import 'package:a_green/aGreen/database/preferrence.dart';
 import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:a_green/aGreen/view/about_agreen.dart';
+import 'package:a_green/aGreen/view/splash_screen.dart';
+import 'package:a_green/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProfileAgreen extends StatefulWidget {
   const ProfileAgreen({super.key});
@@ -15,7 +18,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
   UserModel? dataUser;
   int _selectedIndex = 0;
   bool isSounding = false; //notif
-  bool isActive = false; //tema
+  bool isOn = false; //tema
 
   @override
   void initState() {
@@ -36,8 +39,9 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
-      backgroundColor: Color(0xffCBF3BB),
+      //backgroundColor: Color(0xffCBF3BB),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -84,7 +88,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                         children: [
                           Text(
                             '${dataUser?.username ?? ""}',
-                            style: TextStyle(fontSize: 20),
+                            style: TextStyle(fontSize: 20, color: Colors.black),
                           ),
                           Text(
                             '${dataUser?.email ?? ""}',
@@ -114,8 +118,8 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                 child: Row(
                   children: [
                     Icon(
-                      isActive ? Icons.dark_mode : Icons.sunny,
-                      color: isActive ? Color(0xffABE7B2) : Color(0xffB7B89F),
+                      isOn ? Icons.dark_mode : Icons.sunny,
+                      color: isOn ? Color(0xffABE7B2) : Color(0xffB7B89F),
                     ),
                     SizedBox(width: 12),
                     Expanded(
@@ -125,22 +129,22 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                         children: [
                           Text(
                             'Theme',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
                           ),
                           Text(
-                            isActive ? 'Dark Mode' : 'Light Mode',
+                            isOn ? 'Dark Mode' : 'Light Mode',
                             style: TextStyle(color: Colors.grey, fontSize: 12),
                           ),
                         ],
                       ),
                     ),
                     Switch(
-                      value: isActive,
+                      value: themeProvider.isDarkMode,
                       onChanged: (value) {
-                        setState(() {
-                          isActive = value;
-                          isActive = value;
-                        });
+                        themeProvider.toggleTheme(value);
                       },
                       inactiveThumbColor: Color(0xffA0C878),
                       activeTrackColor: Color(0xffCBF3BB),
@@ -175,7 +179,10 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                         children: [
                           Text(
                             'Notification',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
                           ),
                           Text(
                             isSounding
@@ -253,6 +260,27 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                         ),
                       ),
                     ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    elevation: 0,
+                    side: BorderSide(color: Colors.red),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SplashScreen()),
+                    );
+                  },
+                  child: Text(
+                    "Logout",
+                    style: TextStyle(color: Colors.black, fontSize: 13),
                   ),
                 ),
               ),

@@ -20,33 +20,99 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
   @override
   void initState() {
     super.initState();
-    getData();
+    loadData();
   }
 
-  Future<void> getData() async {
-    var id = await PreferenceHandler.getId();
+  // Load user data and plant list
+  Future<void> loadData() async {
+    int? id = await PreferenceHandler.getId();
+
     if (id != null) {
-      UserModel? result = await DbHelper.getUser(id);
-      List<PlantModel> plantsData = await DbHelper.getPlantsByUser(id);
+      print("User ID: $id");
+      final user = await DbHelper.getUser(id);
+      final plants = await DbHelper.getPlantsByUser(id);
+      print("Fetched plants count: ${plants.length}");
 
       setState(() {
-        dataUser = result;
-        userPlants = plantsData;
+        dataUser = user;
+        userPlants = plants;
       });
     }
   }
 
-  // getData() async {
-  //   var id = await PreferenceHandler.getId();
-  //   UserModel? result = await DbHelper.getUser(id);
-  //   dataUser = result;
-  //   setState(() {});
-  // }
+  // Show update form dialog
+  void showUpdateDialog(PlantModel plant) {
+    final TextEditingController nameController = TextEditingController(
+      text: plant.name,
+    );
+    final TextEditingController typeController = TextEditingController(
+      text: plant.plant,
+    );
+    final TextEditingController frequencyController = TextEditingController(
+      text: plant.frequency,
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Update Plant'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(labelText: 'Plant Name'),
+              ),
+              TextField(
+                controller: typeController,
+                decoration: InputDecoration(labelText: 'Plant Type'),
+              ),
+              TextField(
+                controller: frequencyController,
+                decoration: InputDecoration(labelText: 'Watering Frequency'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () => Navigator.pop(context),
+            ),
+            ElevatedButton(
+              child: Text('Save'),
+              onPressed: () async {
+                final updatedPlant = PlantModel(
+                  id: plant.id,
+                  name: nameController.text,
+                  plant: typeController.text,
+                  frequency: frequencyController.text,
+                  status: plant.status,
+                  userId: plant.userId,
+                );
+
+                // Call update in DB
+                await DbHelper.updatePlant(updatedPlant);
+                Navigator.pop(context);
+                loadData(); // Refresh the list
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Delete plant and reload
+  Future<void> deletePlant(int id) async {
+    await DbHelper.deletePlant(id);
+    loadData(); // Refresh after delete
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffCBF3BB),
+      //backgroundColor: const Color(0xffCBF3BB),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -81,63 +147,50 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                     borderRadius: BorderRadius.circular(15),
                   ),
 
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadiusGeometry.circular(12),
-                        // child: Image.asset(
-                        //   'assets/images/orchid.jpg',
-                        //   width: 60,
-                        //   height: 60,
-                        //   fit: BoxFit.cover,
-                        // ),
-                      ),
-
-                      SizedBox(height: 5),
-                      userPlants == null
-                          ? CircularProgressIndicator()
-                          : Expanded(
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: userPlants?.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  final data = userPlants![index];
-                                  return Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${data.name}', //sampe sini
-
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      SizedBox(height: 10),
-                                      Text('${data.plant}'),
-                                      SizedBox(height: 10),
-                                      Text('${data.frequency}'),
-                                      // Text("Orchid", style: TextStyle(fontSize: 13)),
-                                      // Text(
-                                      //   "61% humidity",
-                                      //   style: TextStyle(fontSize: 12),
-                                      // ),
-                                      LinearProgressIndicator(
-                                        borderRadius: BorderRadius.circular(11),
-                                        backgroundColor: Color(0x80A6AD88),
-                                      ),
-                                      // SizedBox(height: 8),
-                                      // Text(
-                                      //   "Day 0 has not been watered",
-                                      //   style: TextStyle(fontSize: 13),
-                                      // ),
-                                    ],
-                                  );
-                                },
+                  // List of plants
+                  child: userPlants == null || userPlants!.isEmpty
+                      ? Center(child: Text('No plants added yet!'))
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: userPlants?.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final data = userPlants![index];
+                            return ListTile(
+                              title: Text(
+                                '${data.name}',
+                                style: TextStyle(fontSize: 18),
                               ),
-                            ),
-                    ],
-                  ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('${data.plant}'),
+                                  Text('Water: ${data.frequency}'),
+                                  LinearProgressIndicator(
+                                    borderRadius: BorderRadius.circular(11),
+                                    backgroundColor: Color(0x80A6AD88),
+                                  ),
+                                ],
+                              ),
+                              // Add edit and delete actions
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit, size: 18),
+                                    color: Color(0xff758A93),
+                                    onPressed: () => showUpdateDialog(data),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, size: 18),
+                                    color: Color(0xff758A93),
+                                    onPressed: () => deletePlant(data.id!),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                 ),
               ),
             ],

@@ -38,7 +38,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffCBF3BB),
+      //backgroundColor: Color(0xffCBF3BB),
       body: Padding(
         padding: EdgeInsets.all(35),
         child: Column(
@@ -59,10 +59,10 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
             ),
             SizedBox(height: 28),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: 150,
+                  width: 200,
                   height: 100,
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -78,23 +78,6 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                       ),
                       SizedBox(height: 20),
                       Text('Plants total', style: TextStyle(fontSize: 10)),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 150,
-                  height: 100,
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text("Frequency:", style: TextStyle(fontSize: 20)), //buntu
-                      SizedBox(height: 20),
-                      Text('Watered this week', style: TextStyle(fontSize: 10)),
                     ],
                   ),
                 ),
@@ -145,6 +128,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                 ),
 
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     ClipRRect(
@@ -165,39 +149,38 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                               itemCount: userPlants?.length,
                               itemBuilder: (BuildContext context, int index) {
                                 final data = userPlants![index];
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${data.name}', //sampe sini
-                                      style: TextStyle(fontSize: 18),
+                                // Card untuk tiap tanaman
+                                return Card(
+                                  elevation: 3,
+                                  margin: EdgeInsets.only(bottom: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(16),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          data.name,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(data.plant),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          'Frequency: ${data.frequency}',
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    SizedBox(height: 10),
-                                    Text('${data.plant}'),
-                                    SizedBox(height: 10),
-                                    Text('${data.frequency}'),
-                                    // SizedBox(width: 12),
-                                    // Expanded(
-                                    //   child: Column(
-                                    //     mainAxisAlignment: MainAxisAlignment.center,
-                                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                                    //     children: [
-                                    //       Text("Joel", style: TextStyle(fontSize: 15)),
-                                    //       SizedBox(height: 6),
-                                    //       Text(
-                                    //         "25 November 2026",
-                                    //         style: TextStyle(fontSize: 13),
-                                    //       ),
-                                    //       SizedBox(height: 6),
-                                    //       Text(
-                                    //         "Joel has joined to your family! yippie",
-                                    //         style: TextStyle(fontSize: 15),
-                                    //       ),
-                                    //     ],
-                                    //   ),
-                                    // ),
-                                  ],
+                                  ),
                                 );
                               },
                             ),

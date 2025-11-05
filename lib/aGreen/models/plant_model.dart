@@ -21,6 +21,7 @@ class PlantModel {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
+      'userId': userId,
       'name': name,
       'plant': plant,
       'status': status,
@@ -31,6 +32,7 @@ class PlantModel {
   factory PlantModel.fromMap(Map<String, dynamic> map) {
     return PlantModel(
       id: map['id'] != null ? map['id'] as int : null,
+      userId: map['userId'] as int?,
       name: map['name'] as String,
       plant: map['plant'] as String,
       status: map['status'] as String,

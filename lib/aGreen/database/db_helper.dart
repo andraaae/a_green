@@ -28,18 +28,18 @@ class DbHelper {
         print("Table $tablePlants created succesfully");
       },
 
-      onUpgrade: (db, oldVersion, newVersion) async {
-        // if (oldVersion < 2) {
-        //   await db.execute(
-        //     "ALTER TABLE $tableUser(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, email TEXT, password TEXT )",
-        //   );
-        //   print("Column 'address' added to $tableUser");
-        // }
-        // if (oldVersion < 3) {
-        //   await db.execute("ALTER TABLE $tableUser ADD COLUMN address TEXT");
-        //   print("Column 'address' added to $tableUser");
-        // }
-      },
+      //onUpgrade: (db, oldVersion, newVersion) async {
+      // if (oldVersion < 2) {
+      //   await db.execute(
+      //     "ALTER TABLE $tableUser(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, email TEXT, password TEXT )",
+      //   );
+      //   print("Column 'address' added to $tableUser");
+      // }
+      // if (oldVersion < 3) {
+      //   await db.execute("ALTER TABLE $tableUser ADD COLUMN address TEXT");
+      //   print("Column 'address' added to $tableUser");
+      // }
+      //},
       version: 1,
     );
   }
@@ -141,13 +141,14 @@ class DbHelper {
 
     final List<Map<String, dynamic>> results = await dbInstance.query(
       tablePlants,
-      where: 'id = ?',
+      where: 'userId = ?',
       whereArgs: [userId],
     );
-    print(results.map((e) => PlantModel.fromMap(e)).toList());
+    print("Plants fetched for user $userId: $results");
     return results.map((e) => PlantModel.fromMap(e)).toList();
   }
 
+  //Get user by ID
   static Future<UserModel?> getUser(int userId) async {
     final dbInstance = await db();
     final List<Map<String, dynamic>> results = await dbInstance.query(
@@ -160,6 +161,19 @@ class DbHelper {
       return UserModel.fromMap(results.first);
     }
     return null;
+  }
+
+  // Update Plant
+  static Future<void> updatePlant(PlantModel plant) async {
+    final dbInstance = await db();
+    await dbInstance.update(
+      tablePlants,
+      plant.toMap(),
+      where: 'id = ?',
+      whereArgs: [plant.id],
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    print("Plant updated: ${plant.toMap()}");
   }
 
   // Delete plant by id

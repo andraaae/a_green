@@ -38,7 +38,7 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffCBF3BB),
+      //backgroundColor: const Color(0xffCBF3BB),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -79,7 +79,7 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
                     ),
                     SizedBox(width: 12),
 
-                    /// TEXT COLUMN
+                    /// Bagian teks notifikasi
                     Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -97,7 +97,7 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
                       ),
                     ),
 
-                    //switch
+                    // Switch on/off untuk mengaktifkan notifikasi
                     Switch(
                       value: isActive,
                       onChanged: (value) {
@@ -112,101 +112,60 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
                   ],
                 ),
               ),
-
-              //       Container( width: double.infinity,height: 50,
-              //         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-              //         child: Row(
-              //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //             children: [
-              //               //icon + text
-              //               Row(
-              //                 children: [
-              //         Icon(isOn? Icons.notifications_active : Icons.notifications_off,
-              //         color: isOn? Color(0xffABE7B2): Color(0xffB7B89F)),
-              //         SizedBox(width: 10),
-              //         Column(
-              //           mainAxisAlignment: MainAxisAlignment.center,
-              //           crossAxisAlignment: CrossAxisAlignment.start,
-              //           children: [
-              //             Text(
-              //               'Notification',
-              //               style: TextStyle(fontWeight: FontWeight.bold),
-              //             ),
-              //             Text(
-              //               'Active',
-              //               style: TextStyle(color: Colors.grey, fontSize: 12),
-              //             ),
-              //           ],
-              //         ),
-              //         SizedBox(width: 100),
-              //         Switch(value: isActive, onChanged: (value){
-              //           setState(() {
-              //             isActive = value;
-              //             isOn = value;
-              //           });
-              //         },
-              //         inactiveThumbColor: Color(0xffA0C878),
-              //         activeTrackColor: Color(0xffCBF3BB),
-              //         )
-              //       ],
-              //      ),
-              //     ],
-              //   ),
-              // ),
               SizedBox(height: 40),
+
               Text('Upcoming Schedule', style: TextStyle(fontSize: 15)),
               SizedBox(height: 12),
+
+              // Bagian card masing-masing tanaman
               Container(
                 padding: EdgeInsets.all(8),
                 width: double.infinity,
+                height: 400, // pastikan ini cukup untuk scroll list
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(15),
                 ),
+                child: userPlants == null
+                    ? Center(child: CircularProgressIndicator())
+                    // List builder untuk menampilkan tiap tanaman
+                    : ListView.builder(
+                        itemCount: userPlants!.length,
+                        itemBuilder: (context, index) {
+                          final data = userPlants![index];
 
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadiusGeometry.circular(12),
-
-                      // child: Image.asset(
-                      //   'assets/images/orchid.jpg',
-                      //   width: 60,
-                      //   height: 60,
-                      //   fit: BoxFit.cover,
-                      // ),
-                    ),
-
-                    //BUNTU GUE
-                    SizedBox(height: 20),
-                    userPlants == null
-                        ? CircularProgressIndicator()
-                        : Expanded(
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: userPlants?.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                final data = userPlants![index];
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${data.name}',
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                    SizedBox(height: 10),
-                                    Text('${data.plant}'),
-                                    SizedBox(height: 10),
-                                    Text('${data.frequency}'),
-                                  ],
-                                );
-                              },
+                          // Card untuk tiap tanaman
+                          return Card(
+                            elevation: 3,
+                            margin: EdgeInsets.only(bottom: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                          ),
-                  ],
-                ),
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    data.name,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(data.plant),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Frequency: ${data.frequency}',
+                                    style: TextStyle(color: Colors.grey[600]),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
               ),
             ],
           ),
