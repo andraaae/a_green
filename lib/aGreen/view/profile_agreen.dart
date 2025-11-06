@@ -119,7 +119,9 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                   children: [
                     Icon(
                       themeProvider.isDarkMode ? Icons.dark_mode : Icons.sunny,
-                      color: themeProvider.isDarkMode ? Color(0xffB7B89F) : Color(0xffABE7B2),
+                      color: themeProvider.isDarkMode
+                          ? Color(0xffB7B89F)
+                          : Color(0xffABE7B2),
                     ),
                     SizedBox(width: 12),
                     Expanded(
@@ -135,7 +137,9 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                             ),
                           ),
                           Text(
-                            themeProvider.isDarkMode ? 'Dark Mode' : 'Light Mode',
+                            themeProvider.isDarkMode
+                                ? 'Dark Mode'
+                                : 'Light Mode',
                             style: TextStyle(color: Colors.grey, fontSize: 12),
                           ),
                         ],
