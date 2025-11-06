@@ -121,7 +121,7 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
               Container(
                 padding: EdgeInsets.all(8),
                 width: double.infinity,
-                height: 200, // pastikan ini cukup untuk scroll list
+                height: 150, // pastikan ini cukup untuk scroll list
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(15),

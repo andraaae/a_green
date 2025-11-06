@@ -83,7 +83,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 40),
             // Row(
             //   children: [
             //     Column(

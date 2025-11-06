@@ -215,7 +215,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
               Divider(color: Colors.green.shade200, thickness: 1, height: 30),
 
               //  about aGreen
-              SizedBox(height: 30),
+              SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -267,14 +267,14 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 50),
+              SizedBox(height: 30),
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
                     elevation: 0,
-                    minimumSize: Size(500, 50),
+                    minimumSize: Size(500, 30),
                     side: BorderSide(color: Colors.red),
                   ),
                   onPressed: () {
