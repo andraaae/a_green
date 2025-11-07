@@ -36,6 +36,14 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
       });
     }
   }
+    //inisial
+   String getInitials(String name) {
+    if (name.isEmpty) return "";
+    List<String> parts = name.trim().split(' ');
+    String initials =
+        parts.map((part) => part[0].toUpperCase()).take(2).join();
+    return initials;
+  }
 
   @override
   Widget build(BuildContext context) {

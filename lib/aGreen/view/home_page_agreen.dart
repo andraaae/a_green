@@ -120,7 +120,7 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 20),
+              SizedBox(height: 30),
               dataUser == null
                   ? CircularProgressIndicator()
                   : Text(
@@ -159,13 +159,22 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                             return ListTile(
                               title: Text(
                                 '${data.name}',
-                                style: TextStyle(fontSize: 18, color: Color(0xff748873)),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Color(0xff748873),
+                                ),
                               ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('${data.plant}', style: TextStyle(color: Color(0xff748873)),),
-                                  Text('Water: ${data.frequency}', style: TextStyle(color: Color(0xff748873)),),
+                                  Text(
+                                    '${data.plant}',
+                                    style: TextStyle(color: Color(0xff748873)),
+                                  ),
+                                  Text(
+                                    'Water: ${data.frequency}',
+                                    style: TextStyle(color: Color(0xff748873)),
+                                  ),
                                   LinearProgressIndicator(
                                     borderRadius: BorderRadius.circular(11),
                                     backgroundColor: Color(0x80A6AD88),
