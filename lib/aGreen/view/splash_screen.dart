@@ -37,10 +37,10 @@ class _SplashScreenState extends State<SplashScreen> {
     });
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffCBF3BB), // warna hijau soft misal
+      backgroundColor: const Color(0xffCBF3BB),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -54,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                Icons.eco,  // ganti icon sesuai yang kamu mau
+                Icons.eco, // ganti icon sesuai yang kamu mau
                 size: 70,
                 color: Color(0xff7BAE7F),
               ),
@@ -62,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
             const SizedBox(height: 20),
 
-            /// Nama aplikasi (opsional)
+            /// Nama aplikasi
             const Text(
               "aGreen",
               style: TextStyle(

@@ -43,7 +43,6 @@ class PreferenceHandler {
   }
 
   //tanaman
-
   static savePlants(List<PlantModel> plants) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> plantJsonList = plants.map((plant) => plant.toJson()).toList();

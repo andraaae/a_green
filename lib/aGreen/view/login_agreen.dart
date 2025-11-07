@@ -63,7 +63,7 @@ class _LoginAgreenState extends State<LoginAgreen> {
 
                   const SizedBox(height: 40),
 
-                  // ===== EMAIL FIELD =====
+                  //EMAIL FIELD
                   const Text('Email'),
                   const SizedBox(height: 7),
                   TextFormField(
@@ -96,7 +96,7 @@ class _LoginAgreenState extends State<LoginAgreen> {
 
                   const SizedBox(height: 20),
 
-                  // ===== PHONE FIELD =====
+                  //PHONE FIELD
                   const Text('Phone Number'),
                   const SizedBox(height: 7),
                   TextFormField(
@@ -125,7 +125,7 @@ class _LoginAgreenState extends State<LoginAgreen> {
 
                   const SizedBox(height: 20),
 
-                  // ===== PASSWORD FIELD =====
+                  //PASSWORD FIELD
                   const Text('Password'),
                   const SizedBox(height: 7),
                   TextFormField(
@@ -166,7 +166,7 @@ class _LoginAgreenState extends State<LoginAgreen> {
 
                   const SizedBox(height: 40),
 
-                  // ===== LOGIN BUTTON =====
+                  //LOGIN BUTTON
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -216,7 +216,7 @@ class _LoginAgreenState extends State<LoginAgreen> {
 
                   const SizedBox(height: 18),
 
-                  // ===== REGISTER LINK =====
+                  //REGISTER LINK
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

@@ -37,6 +37,14 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
     }
   }
 
+  //inisial
+  String getInitials(String name) {
+    if (name.isEmpty) return "";
+    List<String> parts = name.trim().split(' ');
+    String initials = parts.map((part) => part[0].toUpperCase()).take(2).join();
+    return initials;
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -119,7 +127,9 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                   children: [
                     Icon(
                       themeProvider.isDarkMode ? Icons.dark_mode : Icons.sunny,
-                      color: themeProvider.isDarkMode ? Color(0xffB7B89F) : Color(0xffABE7B2),
+                      color: themeProvider.isDarkMode
+                          ? Color(0xffB7B89F)
+                          : Color(0xffABE7B2),
                     ),
                     SizedBox(width: 12),
                     Expanded(
@@ -135,7 +145,9 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                             ),
                           ),
                           Text(
-                            themeProvider.isDarkMode ? 'Dark Mode' : 'Light Mode',
+                            themeProvider.isDarkMode
+                                ? 'Dark Mode'
+                                : 'Light Mode',
                             style: TextStyle(color: Colors.grey, fontSize: 12),
                           ),
                         ],
@@ -211,7 +223,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
               Divider(color: Colors.green.shade200, thickness: 1, height: 30),
 
               //  about aGreen
-              SizedBox(height: 30),
+              SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -263,14 +275,14 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 50),
+              SizedBox(height: 30),
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
                     elevation: 0,
-                    minimumSize: Size(500, 50),
+                    minimumSize: Size(500, 30),
                     side: BorderSide(color: Colors.red),
                   ),
                   onPressed: () {

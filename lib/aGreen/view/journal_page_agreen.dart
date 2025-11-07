@@ -83,7 +83,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 40),
             // Row(
             //   children: [
             //     Column(
@@ -114,7 +114,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
               width: double.infinity,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [Text('Timeline', style: TextStyle(fontSize: 15))],
+                children: [Text('Friend(s)', style: TextStyle(fontSize: 15))],
               ),
             ),
             SizedBox(height: 14),
