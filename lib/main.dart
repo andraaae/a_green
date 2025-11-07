@@ -1,15 +1,4 @@
-import 'package:a_green/aGreen/bottom_navigation/buttom_navigation_agreen.dart';
-import 'package:a_green/aGreen/view/about_agreen.dart';
-import 'package:a_green/aGreen/view/add_plants_agreen.dart';
-import 'package:a_green/aGreen/view/first_page_agreen.dart';
-import 'package:a_green/aGreen/view/home_page_agreen.dart';
-import 'package:a_green/aGreen/view/journal_page_agreen.dart';
-import 'package:a_green/aGreen/view/login_agreen.dart';
-import 'package:a_green/aGreen/view/profile_agreen.dart';
-import 'package:a_green/aGreen/view/register_agreen.dart';
-import 'package:a_green/aGreen/view/reminder_agreen.dart';
 import 'package:a_green/aGreen/view/splash_screen.dart';
-import 'package:a_green/aGreen/view/welcome_page.dart';
 import 'package:a_green/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

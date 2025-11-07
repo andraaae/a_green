@@ -16,7 +16,7 @@ class ProfileAgreen extends StatefulWidget {
 
 class _ProfileAgreenState extends State<ProfileAgreen> {
   UserModel? dataUser;
-  int _selectedIndex = 0;
+  final int _selectedIndex = 0;
   bool isSounding = false; //notif
   bool isOn = false; //tema
 
@@ -77,7 +77,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                         radius: 45,
                         backgroundColor: Color(0xffB9D4AA),
                         child: Text(
-                          '${dataUser?.username ?? ""}',
+                          dataUser?.username ?? "",
                           style: TextStyle(fontSize: 25),
                         ),
                       ),
@@ -87,11 +87,11 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${dataUser?.username ?? ""}',
+                            dataUser?.username ?? "",
                             style: TextStyle(fontSize: 20, color: Colors.black),
                           ),
                           Text(
-                            '${dataUser?.email ?? ""}',
+                            dataUser?.email ?? "",
                             style: TextStyle(fontSize: 16, color: Colors.grey),
                           ),
                         ],

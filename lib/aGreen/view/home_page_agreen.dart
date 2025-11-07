@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 class HomePageAgreen extends StatefulWidget {
   @override
-  const HomePageAgreen({Key? key}) : super(key: key);
+  const HomePageAgreen({super.key});
 
   @override
   State<HomePageAgreen> createState() => _HomePageAgreenState();
@@ -158,13 +158,13 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                             final data = userPlants![index];
                             return ListTile(
                               title: Text(
-                                '${data.name}',
+                                data.name,
                                 style: TextStyle(fontSize: 18, color: Color(0xff748873)),
                               ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('${data.plant}', style: TextStyle(color: Color(0xff748873)),),
+                                  Text(data.plant, style: TextStyle(color: Color(0xff748873)),),
                                   Text('Water: ${data.frequency}', style: TextStyle(color: Color(0xff748873)),),
                                   LinearProgressIndicator(
                                     borderRadius: BorderRadius.circular(11),

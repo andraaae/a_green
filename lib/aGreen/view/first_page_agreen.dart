@@ -1,8 +1,5 @@
-import 'package:a_green/aGreen/bottom_navigation/buttom_navigation_agreen.dart';
-import 'package:a_green/aGreen/view/home_page_agreen.dart';
 import 'package:a_green/aGreen/view/login_agreen.dart';
 import 'package:flutter/material.dart';
-import 'package:a_green/aGreen/models/user_model.dart';
 
 class FirstPageAgreen extends StatefulWidget {
   const FirstPageAgreen({super.key});

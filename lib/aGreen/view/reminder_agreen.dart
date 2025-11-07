@@ -14,7 +14,7 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
   List<PlantModel>? userPlants = [];
   bool isActive = false;
   bool isOn = false;
-  int _selectedIndex = 0;
+  final int _selectedIndex = 0;
 
   @override
   void initState() {

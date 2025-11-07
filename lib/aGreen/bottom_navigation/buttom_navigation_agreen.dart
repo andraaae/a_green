@@ -1,4 +1,3 @@
-import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:a_green/aGreen/view/add_plants_agreen.dart';
 import 'package:a_green/aGreen/view/home_page_agreen.dart';
 import 'package:a_green/aGreen/view/journal_page_agreen.dart';

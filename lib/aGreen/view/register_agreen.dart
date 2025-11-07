@@ -1,6 +1,5 @@
 import 'package:a_green/aGreen/database/db_helper.dart';
 import 'package:a_green/aGreen/models/user_model.dart';
-import 'package:a_green/aGreen/view/first_page_agreen.dart';
 import 'package:a_green/aGreen/view/login_agreen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';

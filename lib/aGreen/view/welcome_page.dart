@@ -1,4 +1,3 @@
-import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:a_green/aGreen/view/register_agreen.dart';
 import 'package:flutter/material.dart';
 

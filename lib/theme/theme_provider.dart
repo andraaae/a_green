@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:a_green/theme/theme_provider.dart';
 
 class ThemeProvider with ChangeNotifier {
   bool _isDarkMode = false;

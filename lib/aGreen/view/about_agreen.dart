@@ -17,7 +17,7 @@ class _AboutAgreenState extends State<AboutAgreen> {
       ),
       backgroundColor: Color(0xffCBF3BB),
       body: const Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

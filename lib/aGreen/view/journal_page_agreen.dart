@@ -110,7 +110,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
             //     ),
             //   ],
             // ),
-            Container(
+            SizedBox(
               width: double.infinity,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

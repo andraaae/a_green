@@ -1,7 +1,6 @@
 import 'package:a_green/aGreen/database/preferrence.dart';
 import 'package:a_green/aGreen/models/plant_model.dart';
 import 'package:a_green/aGreen/models/user_model.dart';
-import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 
 import 'package:sqflite/sqflite.dart';
