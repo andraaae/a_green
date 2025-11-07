@@ -1,3 +1,4 @@
+import 'package:a_green/aGreen/view/register_agreen.dart';
 import 'package:a_green/aGreen/view/splash_screen.dart';
 import 'package:a_green/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: themeProvider.currentTheme,
-      home: RegisterAgreen(),
+      home: SplashScreen(),
     );
   }
 }
