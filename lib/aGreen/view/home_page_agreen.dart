@@ -158,8 +158,8 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                             final data = userPlants![index];
                             return ListTile(
                               title: Text(
-                                data.name,
-                                style: TextStyle(fontSize: 18, color: Color(0xff748873)),
+                                
+                                
                                 '${data.name}',
                                 style: TextStyle(
                                   fontSize: 18,
