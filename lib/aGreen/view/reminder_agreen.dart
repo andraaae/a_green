@@ -81,7 +81,7 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 12),
+              const SizedBox(height: 40),
               const Text(
                 'Reminder',
                 style: TextStyle(
@@ -166,7 +166,7 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
                         ? const Padding(
                             padding: EdgeInsets.all(24.0),
                             child: Center(
-                              child: Text('Belum ada tanaman untuk diingatkan 🌱'),
+                              child: Text('No plants yet 🌱'),
                             ),
                           )
                         : ListView.builder(
