@@ -47,29 +47,14 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             /// Icon/logo di tengah
             Container(
-              width: 120,
-              height: 120,
+              width: 200,
+              height: 200,
               decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.eco, // ganti icon sesuai yang kamu mau
-                size: 70,
-                color: Color(0xff7BAE7F),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            /// Nama aplikasi
-            const Text(
-              "aGreen",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Image.asset('assets/images/aGreen.jpg'),
+                )
             ),
           ],
         ),

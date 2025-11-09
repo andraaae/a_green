@@ -2,48 +2,45 @@ import 'package:a_green/aGreen/database/preferrence.dart';
 import 'package:a_green/aGreen/models/plant_model.dart';
 import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:path/path.dart';
-
 import 'package:sqflite/sqflite.dart';
 
 class DbHelper {
   static const String _dbName = 'a_Green.db';
   static const tableUser = 'Users';
   static const tablePlants = 'Plants';
+
   static Future<Database> db() async {
     final dbPath = await getDatabasesPath();
     return openDatabase(
       join(dbPath, _dbName),
-
+      version: 2,
       onCreate: (db, version) async {
         await db.execute(
           "CREATE TABLE $tableUser(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, email TEXT, password TEXT, phone TEXT, address TEXT)",
         );
-        print("Table $tableUser created succesfully");
-
         await db.execute(
-          "CREATE TABLE $tablePlants(" // buat tabel plant
-          "id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, plant TEXT, status TEXT, frequency TEXT, userId INTEGER NOT NULL)",
+          "CREATE TABLE $tablePlants("
+          "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+          "name TEXT, "
+          "plant TEXT, "
+          "status TEXT, "
+          "frequency TEXT, "
+          "lastWateredDate TEXT, "
+          "userId INTEGER NOT NULL)",
         );
-        print("Table $tablePlants created succesfully");
+        print("Tables created successfully");
       },
-
-      //onUpgrade: (db, oldVersion, newVersion) async {
-      // if (oldVersion < 2) {
-      //   await db.execute(
-      //     "ALTER TABLE $tableUser(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, email TEXT, password TEXT )",
-      //   );
-      //   print("Column 'address' added to $tableUser");
-      // }
-      // if (oldVersion < 3) {
-      //   await db.execute("ALTER TABLE $tableUser ADD COLUMN address TEXT");
-      //   print("Column 'address' added to $tableUser");
-      // }
-      //},
-      version: 1,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute(
+              "ALTER TABLE $tablePlants ADD COLUMN lastWateredDate TEXT");
+          print("Column 'lastWateredDate' added");
+        }
+      },
     );
   }
 
-  //register user
+  // === USER METHODS ===
   static Future<void> registerUser(UserModel user) async {
     final dbs = await db();
     await dbs.insert(
@@ -51,10 +48,8 @@ class DbHelper {
       user.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    print(user.toMap());
   }
 
-  //login user
   static Future<UserModel?> loginUser({
     required String email,
     required String password,
@@ -65,65 +60,45 @@ class DbHelper {
       where: 'email = ? AND password = ?',
       whereArgs: [email, password],
     );
-    print('Login query result: $result');
-    //query adalah fungsi untuk menampilkan data (READ)
-    final List<Map<String, dynamic>> results = await dbs.query(
-      tableUser,
-      where: 'email = ? AND password = ?',
-      whereArgs: [email, password],
-    );
-    print('Login query result: $results');
-    if (results.isNotEmpty) {
-      final dataUser = UserModel.fromMap(results.first);
+    if (result.isNotEmpty) {
+      final dataUser = UserModel.fromMap(result.first);
       PreferenceHandler.saveId(dataUser.id!);
-      return UserModel.fromMap(results.first);
+      return dataUser;
     }
     return null;
   }
 
-  //add User
-  static Future<void> createUser(UserModel User) async {
-    final dbs = await db();
-    //Insert adalah fungsi untuk menambahkan data (CREATE)
-    await dbs.insert(
-      tableUser,
-      User.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-    print(User.toMap());
-  }
-
-  //get User
   static Future<List<UserModel>> getAllUser() async {
     final dbs = await db();
-    final List<Map<String, dynamic>> results = await dbs.query(tableUser);
-    print(results.map((e) => UserModel.fromMap(e)).toList());
+    final results = await dbs.query(tableUser);
     return results.map((e) => UserModel.fromMap(e)).toList();
   }
 
-  //update User
-  static Future<void> updateUser(UserModel User) async {
+  static Future<void> updateUser(UserModel user) async {
     final dbs = await db();
-    //Insert adalah fungsi untuk menambahkan data (CREATE)
     await dbs.update(
       tableUser,
-      User.toMap(),
+      user.toMap(),
       where: "id = ?",
-      whereArgs: [User.id],
+      whereArgs: [user.id],
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    print(User.toMap());
   }
 
-  //delete user
   static Future<void> deleteUser(int id) async {
     final dbs = await db();
-
     await dbs.delete(tableUser, where: "id = ?", whereArgs: [id]);
-    print("user $id deleted");
   }
 
-  // Add Plant
+  static Future<UserModel?> getUser(int userId) async {
+    final dbs = await db();
+    final result =
+        await dbs.query(tableUser, where: 'id = ?', whereArgs: [userId]);
+    if (result.isNotEmpty) return UserModel.fromMap(result.first);
+    return null;
+  }
+
+  // === PLANT METHODS ===
   static Future<void> addPlant(PlantModel plant) async {
     final dbInstance = await db();
     await dbInstance.insert(
@@ -131,38 +106,18 @@ class DbHelper {
       plant.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    print("Plant added: $plant");
   }
 
-  // Get plants by userId
   static Future<List<PlantModel>> getPlantsByUser(int userId) async {
     final dbInstance = await db();
-
-    final List<Map<String, dynamic>> results = await dbInstance.query(
+    final results = await dbInstance.query(
       tablePlants,
       where: 'userId = ?',
       whereArgs: [userId],
     );
-    print("Plants fetched for user $userId: $results");
     return results.map((e) => PlantModel.fromMap(e)).toList();
   }
 
-  //Get user by ID
-  static Future<UserModel?> getUser(int userId) async {
-    final dbInstance = await db();
-    final List<Map<String, dynamic>> results = await dbInstance.query(
-      tableUser,
-      where: 'id = ?',
-      whereArgs: [userId],
-    );
-    print(results);
-    if (results.isNotEmpty) {
-      return UserModel.fromMap(results.first);
-    }
-    return null;
-  }
-
-  // Update Plant
   static Future<void> updatePlant(PlantModel plant) async {
     final dbInstance = await db();
     await dbInstance.update(
@@ -172,13 +127,56 @@ class DbHelper {
       whereArgs: [plant.id],
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    print("Plant updated: ${plant.toMap()}");
   }
 
-  // Delete plant by id
+  static Future<void> updateLastWateredDate(int plantId) async {
+    final dbInstance = await db();
+    String today = DateTime.now().toIso8601String();
+    await dbInstance.update(
+      tablePlants,
+      {'lastWateredDate': today},
+      where: 'id = ?',
+      whereArgs: [plantId],
+    );
+  }
+
   static Future<void> deletePlant(int id) async {
     final dbInstance = await db();
     await dbInstance.delete(tablePlants, where: 'id = ?', whereArgs: [id]);
-    print("Plant $id deleted");
+  }
+
+  // ============================================================
+  // 🆕 Tambahan logika untuk progress & alert penyiraman
+  // ============================================================
+
+  /// Menghitung progress penyiraman tanaman (0.0 - 1.0)
+  static double calculateWateringProgress(PlantModel plant) {
+    if (plant.lastWateredDate == null || plant.frequency.isEmpty) {
+      return 1.0; // default full progress (butuh disiram)
+    }
+
+    DateTime lastWatered = DateTime.parse(plant.lastWateredDate!);
+    int totalDays = _getFrequencyInDays(plant.frequency);
+    int passedDays = DateTime.now().difference(lastWatered).inDays;
+
+    double progress = (passedDays / totalDays).clamp(0.0, 1.0);
+    return progress;
+  }
+
+  /// Mengecek apakah tanaman sudah waktunya disiram
+  static bool isWateringDue(PlantModel plant) {
+    double progress = calculateWateringProgress(plant);
+    return progress >= 1.0;
+  }
+
+  /// Mengubah teks frekuensi jadi jumlah hari
+  static int _getFrequencyInDays(String frequency) {
+    frequency = frequency.toLowerCase();
+    if (frequency.contains("hari")) return 1;
+    if (frequency.contains("2-3 hari")) return 3;
+    if (frequency.contains("4-6 hari")) return 6;
+    if (frequency.contains("1-2 minggu")) return 14;
+    if (frequency.contains("3-4 minggu")) return 28;
+    return 7; // default seminggu
   }
 }

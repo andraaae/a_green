@@ -1,4 +1,3 @@
-import 'package:a_green/aGreen/view/register_agreen.dart';
 import 'package:a_green/aGreen/view/splash_screen.dart';
 import 'package:a_green/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +20,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: themeProvider.currentTheme,
       home: SplashScreen(),

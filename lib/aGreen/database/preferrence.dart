@@ -5,44 +5,44 @@ class PreferenceHandler {
   static const String isLogin = "isLogin";
   static const String isId = "isId";
   static const String plantList = "plantList";
+  static const String notifStatus = "notificationStatus"; // 🆕 key untuk notifikasi
 
-  //Save data login pada saat login
+  // ======== LOGIN HANDLER ========
 
   static saveLogin(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool(isLogin, value);
   }
 
-  //Ambil data login pada saat mau login / ke dashboard
   static getLogin() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(isLogin);
   }
 
-  //Hapus data login pada saat logout
   static removeLogin() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(isLogin);
   }
+
+  // ======== ID HANDLER ========
 
   static saveId(int value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setInt(isId, value);
   }
 
-  //Ambil data Id pada saat mau Id / ke dashboard
   static getId() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt(isId);
   }
 
-  //Hapus data Id pada saat logout
   static removeId() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(isId);
   }
 
-  //tanaman
+  // ======== TANAMAN HANDLER ========
+
   static savePlants(List<PlantModel> plants) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> plantJsonList = plants.map((plant) => plant.toJson()).toList();
@@ -65,5 +65,22 @@ class PreferenceHandler {
   static removePlants() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(plantList);
+  }
+
+  // ======== NOTIFICATION HANDLER 🆕 ========
+
+  static Future<void> setNotificationEnabled(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(notifStatus, value);
+  }
+
+  static Future<bool> getNotificationEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(notifStatus) ?? true; // default: ON
+  }
+
+  static Future<void> removeNotificationStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(notifStatus);
   }
 }
