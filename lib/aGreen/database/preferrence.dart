@@ -41,7 +41,7 @@ class PreferenceHandler {
     prefs.remove(isId);
   }
 
-  // ======== TANAMAN HANDLER ========
+  //TANAMAN HANDLER
 
   static savePlants(List<PlantModel> plants) async {
     final prefs = await SharedPreferences.getInstance();

@@ -40,7 +40,7 @@ class DbHelper {
     );
   }
 
-  // === USER METHODS ===
+  //USER METHODS
   static Future<void> registerUser(UserModel user) async {
     final dbs = await db();
     await dbs.insert(
@@ -98,7 +98,7 @@ class DbHelper {
     return null;
   }
 
-  // === PLANT METHODS ===
+  //PLANT METHODS
   static Future<void> addPlant(PlantModel plant) async {
     final dbInstance = await db();
     await dbInstance.insert(
@@ -145,9 +145,9 @@ class DbHelper {
     await dbInstance.delete(tablePlants, where: 'id = ?', whereArgs: [id]);
   }
 
-  // ============================================================
-  // 🆕 Tambahan logika untuk progress & alert penyiraman
-  // ============================================================
+ 
+  //Tambahan logika untuk progress & alert penyiraman
+ 
 
   /// Menghitung progress penyiraman tanaman (0.0 - 1.0)
   static double calculateWateringProgress(PlantModel plant) {
