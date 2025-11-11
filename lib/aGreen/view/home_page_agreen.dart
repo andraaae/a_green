@@ -22,7 +22,6 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
     loadData();
   }
 
-  // 🔹 Load user & plant data
   Future<void> loadData() async {
     int? id = await PreferenceHandler.getId();
 
@@ -36,14 +35,12 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
     }
   }
 
-  // 🔹 Calculate watering progress
   double calculateProgress(PlantModel plant) {
     if (plant.lastWateredDate == null) return 0.0;
 
     final lastWatered = DateTime.tryParse(plant.lastWateredDate!);
     if (lastWatered == null) return 0.0;
 
-    // extract number from frequency (e.g., "3 days" → 3)
     final freqMatch = RegExp(r'\d+').firstMatch(plant.frequency);
     int freqDays = freqMatch != null ? int.parse(freqMatch.group(0)!) : 3;
 
@@ -51,11 +48,9 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
     final diffDays = now.difference(lastWatered).inDays;
 
     double progress = diffDays / freqDays;
-    if (progress > 1.0) progress = 1.0;
-    return progress;
+    return progress.clamp(0.0, 1.0);
   }
 
-  // 🔹 Update last watered date to today
   Future<void> waterPlant(PlantModel plant) async {
     final updated = PlantModel(
       id: plant.id,
@@ -71,7 +66,6 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
     loadData();
   }
 
-  // 🔹 Edit plant dialog
   void showUpdateDialog(PlantModel plant) {
     final TextEditingController nameController =
         TextEditingController(text: plant.name);
@@ -84,6 +78,7 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: const Text('Edit Plant'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -98,7 +93,8 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
               ),
               TextField(
                 controller: frequencyController,
-                decoration: const InputDecoration(labelText: 'Watering Frequency'),
+                decoration:
+                    const InputDecoration(labelText: 'Watering Frequency'),
               ),
             ],
           ),
@@ -108,6 +104,9 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
               onPressed: () => Navigator.pop(context),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
               child: const Text('Save'),
               onPressed: () async {
                 final updatedPlant = PlantModel(
@@ -131,11 +130,11 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
     );
   }
 
-  // 🔹 Delete confirmation
   Future<void> deletePlantWithConfirm(PlantModel plant) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: const Text('Delete Plant'),
         content: Text('Are you sure you want to delete "${plant.name}"?'),
         actions: [
@@ -170,6 +169,14 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final cardColor = isDark ? Colors.grey[850] : Colors.white;
+    final textColor = isDark ? Colors.grey[200] : const Color(0xff748873);
+    final subTextColor =
+        isDark ? Colors.grey[400] : const Color(0xff748873);
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -183,20 +190,20 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                   ? const CircularProgressIndicator()
                   : Text(
                       'Hello, ${dataUser?.username ?? ""}!',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20,
-                        color: Color(0xff777C6D),
+                        color: textColor,
                       ),
                     ),
               const SizedBox(height: 10),
-              const Text(
+              Text(
                 'How are your plants today?',
-                style: TextStyle(fontSize: 18, color: Color(0xff819067)),
+                style: TextStyle(fontSize: 18, color: subTextColor),
               ),
               const SizedBox(height: 25),
-              const Text(
+              Text(
                 'Your Plants',
-                style: TextStyle(fontSize: 16, color: Color(0xff819067)),
+                style: TextStyle(fontSize: 16, color: subTextColor),
               ),
               const SizedBox(height: 20),
               Center(
@@ -204,11 +211,24 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                   padding: const EdgeInsets.all(8),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: cardColor,
                     borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      if (!isDark)
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        )
+                    ],
                   ),
                   child: userPlants == null || userPlants!.isEmpty
-                      ? const Center(child: Text('No plants added yet!'))
+                      ? Center(
+                          child: Text(
+                            'No plants added yet!',
+                            style: TextStyle(color: subTextColor),
+                          ),
+                        )
                       : ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -217,44 +237,37 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                             final data = userPlants![index];
                             final progress = calculateProgress(data);
                             final progressPercent = (progress * 100).toInt();
-
                             final canWater = progress >= 1.0;
 
                             return ListTile(
                               title: Text(
                                 data.name,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 18,
-                                  color: Color(0xff748873),
+                                  color: textColor,
                                 ),
                               ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    data.plant,
-                                    style: const TextStyle(
-                                        color: Color(0xff748873)),
-                                  ),
-                                  Text(
-                                    'Watering frequency: ${data.frequency}',
-                                    style: const TextStyle(
-                                        color: Color(0xff748873)),
-                                  ),
+                                  Text(data.plant, style: TextStyle(color: subTextColor)),
+                                  Text('Watering frequency: ${data.frequency}',
+                                      style: TextStyle(color: subTextColor)),
                                   const SizedBox(height: 4),
                                   LinearProgressIndicator(
                                     value: progress,
                                     borderRadius: BorderRadius.circular(11),
-                                    backgroundColor: const Color(0x80A6AD88),
+                                    backgroundColor: isDark
+                                        ? Colors.grey[700]
+                                        : const Color(0x80A6AD88),
                                     valueColor:
-                                        const AlwaysStoppedAnimation<Color>(
-                                            Color(0xffA6AD88)),
+                                        AlwaysStoppedAnimation<Color>(
+                                            const Color(0xffA6AD88)),
                                   ),
                                   Text(
                                     'Progress: $progressPercent%',
-                                    style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Color(0xff748873)),
+                                    style: TextStyle(
+                                        fontSize: 12, color: subTextColor),
                                   ),
                                 ],
                               ),
@@ -262,22 +275,22 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    icon: const Icon(Icons.water_drop, size: 18),
+                                    icon:
+                                        const Icon(Icons.water_drop, size: 18),
                                     color: canWater
-                                        ? const Color(0xff758A93)
-                                        : Colors.grey.shade400,
-                                    onPressed: canWater
-                                        ? () => waterPlant(data)
-                                        : null,
+                                        ? const Color(0xffA6D8A8)
+                                        : Colors.grey.shade500,
+                                    onPressed:
+                                        canWater ? () => waterPlant(data) : null,
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.edit, size: 18),
-                                    color: const Color(0xff758A93),
+                                    color: const Color(0xffA6D8A8),
                                     onPressed: () => showUpdateDialog(data),
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.delete, size: 18),
-                                    color: const Color(0xff758A93),
+                                    color: Color(0xffB7B89F),
                                     onPressed: () =>
                                         deletePlantWithConfirm(data),
                                   ),

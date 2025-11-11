@@ -23,7 +23,6 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
     loadNotificationStatus();
   }
 
-  // 🔹 Ambil data tanaman user dari database
   Future<void> getReminderData() async {
     var id = await PreferenceHandler.getId();
     if (id != null) {
@@ -34,7 +33,6 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
     }
   }
 
-  // 🔹 Status toggle notifikasi
   Future<void> loadNotificationStatus() async {
     bool status = await PreferenceHandler.getNotificationEnabled();
     setState(() {
@@ -51,20 +49,15 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
     await PreferenceHandler.setNotificationEnabled(value);
   }
 
-  // 🔹 Cek apakah sudah waktunya disiram
   bool isTimeToWater(String? lastWateredDate, String frequency) {
     if (lastWateredDate == null) return true;
-
     final lastWatered = DateTime.tryParse(lastWateredDate);
     if (lastWatered == null) return true;
-
     final freqMatch = RegExp(r'\d+').firstMatch(frequency);
     int freqDays = freqMatch != null ? int.parse(freqMatch.group(0)!) : 3;
-
     return DateTime.now().difference(lastWatered).inDays >= freqDays;
   }
 
-  // 🔹 Refresh data tiap kali halaman dibuka ulang
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -73,6 +66,9 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -81,28 +77,31 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 40),
-              const Text(
+              const SizedBox(height: 45),
+              Text(
                 'Reminder',
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xff658C58),
+                  color: isDark ? Colors.green[200] : const Color(0xff658C58),
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 "Don't forget to water your plants",
-                style: TextStyle(fontSize: 15),
+                style: TextStyle(
+                  fontSize: 15,
+                  color: isDark ? Colors.grey[300] : Colors.grey[800],
+                ),
               ),
               const SizedBox(height: 20),
 
-              // 🔔 Container toggle notifikasi
+              // 🔔 Toggle notification container
               Container(
                 width: double.infinity,
                 height: 70,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? Colors.grey[850] : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -112,8 +111,13 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
                       isOn
                           ? Icons.notifications_active
                           : Icons.notifications_off,
-                      color:
-                          isOn ? const Color(0xffABE7B2) : const Color(0xffB7B89F),
+                      color: isOn
+                          ? (isDark
+                              ? Colors.greenAccent
+                              : const Color(0xffABE7B2))
+                          : (isDark
+                              ? Colors.grey[600]
+                              : const Color(0xffB7B89F)),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -121,14 +125,17 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Notification',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
                           ),
                           Text(
                             isOn ? 'Active' : 'Inactive',
-                            style: const TextStyle(
-                              color: Colors.grey,
+                            style: TextStyle(
+                              color: isDark ? Colors.grey[400] : Colors.grey,
                               fontSize: 12,
                             ),
                           ),
@@ -148,8 +155,13 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
               ),
               const SizedBox(height: 40),
 
-              const Text('Upcoming Schedule',
-                  style: TextStyle(fontSize: 15)),
+              Text(
+                'Upcoming Schedule',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
+              ),
               const SizedBox(height: 12),
 
               // 🌿 List tanaman
@@ -157,16 +169,23 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
                 padding: const EdgeInsets.all(8),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? Colors.grey[850] : Colors.white,
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: userPlants == null
                     ? const Center(child: CircularProgressIndicator())
                     : userPlants!.isEmpty
-                        ? const Padding(
-                            padding: EdgeInsets.all(24.0),
+                        ? Padding(
+                            padding: const EdgeInsets.all(24.0),
                             child: Center(
-                              child: Text('No plants yet 🌱'),
+                              child: Text(
+                                'No plants yet 🌱',
+                                style: TextStyle(
+                                  color: isDark
+                                      ? Colors.grey[400]
+                                      : Colors.grey[700],
+                                ),
+                              ),
                             ),
                           )
                         : ListView.builder(
@@ -175,10 +194,13 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
                             itemCount: userPlants!.length,
                             itemBuilder: (context, index) {
                               final data = userPlants![index];
-                              final shouldWater =
-                                  isTimeToWater(data.lastWateredDate, data.frequency);
+                              final shouldWater = isTimeToWater(
+                                  data.lastWateredDate, data.frequency);
 
                               return Card(
+                                color: isDark
+                                    ? Colors.grey[900]
+                                    : Colors.grey[50],
                                 elevation: 3,
                                 margin: const EdgeInsets.only(bottom: 12),
                                 shape: RoundedRectangleBorder(
@@ -202,9 +224,12 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
                                               children: [
                                                 Text(
                                                   data.name,
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.bold,
+                                                    color: isDark
+                                                        ? Colors.white
+                                                        : Colors.black,
                                                   ),
                                                 ),
                                                 if (shouldWater)
@@ -215,19 +240,30 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
                                               ],
                                             ),
                                             const SizedBox(height: 8),
-                                            Text(data.plant),
+                                            Text(
+                                              data.plant,
+                                              style: TextStyle(
+                                                color: isDark
+                                                    ? Colors.grey[400]
+                                                    : Colors.grey[800],
+                                              ),
+                                            ),
                                             const SizedBox(height: 4),
                                             Text(
                                               'Frequency: ${data.frequency}',
                                               style: TextStyle(
-                                                color: Colors.grey[600],
+                                                color: isDark
+                                                    ? Colors.grey[500]
+                                                    : Colors.grey[600],
                                               ),
                                             ),
                                             if (data.lastWateredDate != null)
                                               Text(
                                                 'Last watered: ${DateFormat('dd MMM yyyy').format(DateTime.parse(data.lastWateredDate!))}',
-                                                style: const TextStyle(
-                                                  color: Colors.grey,
+                                                style: TextStyle(
+                                                  color: isDark
+                                                      ? Colors.grey[500]
+                                                      : Colors.grey,
                                                   fontSize: 12,
                                                 ),
                                               ),

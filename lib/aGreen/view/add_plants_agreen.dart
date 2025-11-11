@@ -119,8 +119,11 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xffCBF3BB),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -131,62 +134,74 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 40),
-                const Text(
+                Text(
                   'Add New Plants',
                   style: TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xffA3CFA2),
+                    color: isDark
+                        ? theme.colorScheme.primary
+                        : const Color(0xff658C58),
                   ),
                 ),
                 const SizedBox(height: 15),
-                const Text(
+                Text(
                   "Fill in the details of your new plant",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: Color(0xff96A78D)),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDark ? Colors.grey[300] : const Color(0xff96A78D),
+                  ),
                 ),
                 const SizedBox(height: 20),
 
-                /// PLANT NAME
-                _buildLabel("Plant's Name"),
+                // PLANT NAME
+                _buildLabel("Plant's Name", isDark),
                 _buildTextField(
                   controller: plantname,
                   hintText: "ex. Peace Lily",
+                  theme: theme,
                 ),
 
-                /// TYPE OF PLANT
+                // TYPE OF PLANT
                 const SizedBox(height: 30),
-                _buildLabel("Type of Plant"),
+                _buildLabel("Type of Plant", isDark),
                 _buildDropdown(
                   hint: 'Choose your plant type',
                   items: typeitems,
                   value: dropDownType,
                   onChanged: (value) => setState(() => dropDownType = value),
+                  theme: theme,
                 ),
 
-                /// FREQUENCY
+                // FREQUENCY
                 const SizedBox(height: 30),
-                _buildLabel("Watering Frequency"),
+                _buildLabel("Watering Frequency", isDark),
                 _buildDropdown(
                   hint: 'Choose watering frequency',
                   items: frequencyitem,
                   value: dropDownFrequency,
                   onChanged: (value) =>
                       setState(() => dropDownFrequency = value),
+                  theme: theme,
                 ),
 
-                /// LAST WATERED DATE
+                // LAST WATERED DATE
                 const SizedBox(height: 30),
-                _buildLabel("Last Watered Date"),
+                _buildLabel("Last Watered Date", isDark),
                 GestureDetector(
                   onTap: () => _selectDate(context),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 15, vertical: 14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: theme.cardColor,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey.shade400),
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.grey.shade700
+                            : Colors.grey.shade400,
+                      ),
                     ),
                     alignment: Alignment.center,
                     child: Text(
@@ -196,8 +211,10 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: selectedDate == null
-                            ? Colors.grey.shade600
-                            : const Color(0xff55695A),
+                            ? (isDark
+                                ? Colors.grey[400]
+                                : Colors.grey.shade600)
+                            : theme.colorScheme.onSurface,
                         fontSize: 14,
                       ),
                     ),
@@ -206,7 +223,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
 
                 const SizedBox(height: 45),
 
-                /// SAVE BUTTON
+                // SAVE BUTTON
                 ElevatedButton(
                   onPressed: () async {
                     if (!formKey.currentState!.validate()) return;
@@ -220,7 +237,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
 
                     final int? userId = await PreferenceHandler.getId();
                     if (userId == null) {
-                      print("User ID not found, please login again");
+                      debugPrint("User ID not found, please login again");
                       return;
                     }
 
@@ -237,7 +254,9 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xffB3E2A7),
+                    backgroundColor: isDark
+                        ? theme.colorScheme.primary
+                        : const Color(0xff658C58),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 120,
@@ -260,12 +279,13 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
     );
   }
 
-  /// Helper widgets biar rapi
-  Widget _buildLabel(String text) => Row(
+  Widget _buildLabel(String text, bool isDark) => Row(
         children: [
           Text(
             text,
-            style: const TextStyle(color: Color(0xff55695A)),
+            style: TextStyle(
+              color: isDark ? Colors.grey[200] : const Color(0xff55695A),
+            ),
           ),
         ],
       );
@@ -273,6 +293,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
+    required ThemeData theme,
   }) =>
       Padding(
         padding: const EdgeInsets.only(top: 7),
@@ -284,12 +305,15 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
           decoration: InputDecoration(
             isDense: true,
             hintText: hintText,
-            hintStyle: const TextStyle(fontSize: 12, color: Color(0xff55695A)),
+            hintStyle: TextStyle(
+              fontSize: 12,
+              color: theme.hintColor,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
             ),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: theme.cardColor,
           ),
         ),
       );
@@ -299,6 +323,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
     required List<String> items,
     required String? value,
     required Function(String?) onChanged,
+    required ThemeData theme,
   }) =>
       Padding(
         padding: const EdgeInsets.only(top: 7),
@@ -311,19 +336,23 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: theme.cardColor,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
           ),
           hint: Center(
             child: Text(
               hint,
-              style: const TextStyle(fontSize: 12, color: Color(0xff55695A)),
+              style: TextStyle(
+                fontSize: 12,
+                color: theme.hintColor,
+              ),
             ),
           ),
           dropdownStyleData: DropdownStyleData(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
+              color: theme.cardColor,
             ),
             elevation: 2,
             offset: const Offset(0, -5),

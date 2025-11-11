@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:a_green/theme/theme_provider.dart';
 
 class AboutAgreen extends StatefulWidget {
   const AboutAgreen({super.key});
@@ -10,48 +12,90 @@ class AboutAgreen extends StatefulWidget {
 class _AboutAgreenState extends State<AboutAgreen> {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+
+    final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFCBF3BB);
+    final cardColor = isDark ? const Color(0xFF2B2B2B) : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subTextColor = isDark ? Colors.grey[400] : Colors.grey[700];
+    final accentColor = isDark ? const Color(0xffA0C878) : const Color(0xff94BF9E);
+
     return Scaffold(
+      backgroundColor: bgColor,
       appBar: AppBar(
-        title: const Text('About aGreen'),
-        backgroundColor: const Color(0xffCBF3BB),
+        backgroundColor: cardColor,
+        elevation: 0,
+        title: Text(
+          'About aGreen',
+          style: TextStyle(
+            color: textColor,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        iconTheme: IconThemeData(color: textColor),
       ),
-      backgroundColor: Color(0xffCBF3BB),
-      body: const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(child: Icon(Icons.eco, size: 80, color: Color(0xff94BF9E))),
-            SizedBox(height: 16),
-            Text(
-              'aGreen is your plant care partner — helping you grow and care for your green friends with confidence and ease. 🌱',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18, height: 1.5),
+            Center(
+              child: Icon(
+                Icons.eco,
+                size: 80,
+                color: accentColor,
+              ),
             ),
-            SizedBox(height: 20),
-            Divider(thickness: 1.2),
-            SizedBox(height: 12),
+            const SizedBox(height: 20),
+            Text(
+              'aGreen is your gentle companion for nurturing plants and mindfulness. '
+              'We believe that caring for your plants is also a way to care for yourself — '
+              'one leaf, one day at a time. 🌱\n\n'
+              'With aGreen, you can track growth, stay organized, and build small, meaningful habits '
+              'that help your green friends thrive effortlessly.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 18,
+                height: 1.5,
+                color: textColor,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Divider(thickness: 1, color: accentColor.withOpacity(0.4)),
+            const SizedBox(height: 16),
             Text(
               '🌿 Key Features:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textColor,
+              ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 10),
             Text(
-              '• Get personalized care reminders\n'
-              '• Track plant growth with a built-in journal\n'
-              '• Receive simple and helpful plant tips',
-              style: TextStyle(fontSize: 16, height: 1.6),
+              '• Get personalized care reminders and track plant growth in one place\n'
+              '• Stay mindful with journaling for your green companions\n'
+              '• Receive simple and helpful plant care tips to keep your plants thriving',
+              style: TextStyle(
+                fontSize: 16,
+                height: 1.6,
+                color: subTextColor,
+              ),
             ),
-            Spacer(),
-            Divider(thickness: 1.2),
-            SizedBox(height: 8),
+            const Spacer(),
+            Divider(thickness: 1, color: accentColor.withOpacity(0.4)),
+            const SizedBox(height: 8),
             Text(
               'Version: 1.0.0\n'
               'Developed by: and\n'
               'Contact: agreen.support@gmail.com',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 14,
+                color: subTextColor,
+              ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
           ],
         ),
       ),

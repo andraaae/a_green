@@ -56,7 +56,6 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
     return initials;
   }
 
-  // 🆕 Dialog untuk edit profil (sudah termasuk konfirmasi sukses)
   void _showEditProfileDialog() {
     final TextEditingController nameController =
         TextEditingController(text: dataUser?.username ?? "");
@@ -107,10 +106,9 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                   );
 
                   await DbHelper.updateUser(updatedUser);
-                  Navigator.pop(context); // tutup dialog edit
+                  Navigator.pop(context);
                   await getData();
 
-                  // 🆕 Dialog konfirmasi sukses
                   if (context.mounted) {
                     showDialog(
                       context: context,
@@ -134,7 +132,9 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xffA0C878),
+                  backgroundColor: const Color(0xffA0C878),
+                  foregroundColor: Colors.black,
+                  textStyle: const TextStyle(fontWeight: FontWeight.w600),
               ),
               child: const Text("Save"),
             ),
@@ -147,6 +147,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
 
     String username = dataUser?.username ?? "";
     String email = dataUser?.email ?? "";
@@ -159,273 +160,175 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 30),
-              const Row(
+              const SizedBox(height: 45),
+              Row(
                 children: [
-                  Text('Profile', style: TextStyle(fontSize: 19)),
-                  SizedBox(width: 6),
-                  Icon(Icons.person, color: Color(0xff777C6D)),
+                  Text(
+                    'Profile',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? Colors.green[200]
+                          : const Color(0xff658C58),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.person,
+                    size: 30,
+                    color: isDark
+                        ? Colors.green[200]
+                        : const Color(0xff658C58),
+                  ),
                 ],
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 30),
 
-              // Profile card
+              // 🌿 Profile Card
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? Colors.grey[850] : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     CircleAvatar(
-  radius: 45,
-  backgroundColor: const Color(0xffB9D4AA),
-  child: initials.isNotEmpty
-      ? Text(
-          initials,
-          style: TextStyle(
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
-            color: themeProvider.isDarkMode
-                ? Colors.white   // 🌙 dark mode → putih
-                : Colors.black,  // 🌞 light mode → hitam
-          ),
-        )
-      : Icon(
-          Icons.person_outline,
-          color: themeProvider.isDarkMode
-              ? Colors.white
-              : Colors.black,
-          size: 45,
-        ),
-),
-
-                    const SizedBox(width: 20),
+                      radius: 50,
+                      backgroundColor:
+                          isDark ? Colors.green[200] : const Color(0xffB9D4AA),
+                      child: initials.isNotEmpty
+                          ? Text(
+                              initials,
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.black : Colors.white,
+                              ),
+                            )
+                          : Icon(
+                              Icons.person_outline,
+                              color: isDark ? Colors.black : Colors.white,
+                              size: 45,
+                            ),
+                    ),
+                    const SizedBox(width: 24),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  username.isNotEmpty ? username : "Guest",
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.black,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: _showEditProfileDialog,
-                                style: TextButton.styleFrom(
-                                  padding: EdgeInsets.zero,
-                                  foregroundColor: const Color(0xffA0C878),
-                                ),
-                                child: const Text(
-                                  'Edit Profile',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ],
+                          Text(
+                            username.isNotEmpty ? username : "Guest",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
+                          const SizedBox(height: 6),
                           Text(
                             email.isNotEmpty ? email : "No email available",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 30),
-              const Text('Setting', style: TextStyle(fontSize: 16)),
-              const SizedBox(height: 18),
-
-              // Theme switch
-              Container(
-                width: double.infinity,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    Icon(
-                      themeProvider.isDarkMode
-                          ? Icons.dark_mode
-                          : Icons.sunny,
-                      color: themeProvider.isDarkMode
-                          ? const Color(0xffB7B89F)
-                          : const Color(0xffABE7B2),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Theme',
                             style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              fontSize: 14,
+                              color: isDark ? Colors.grey[400] : Colors.grey,
                             ),
                           ),
-                          Text(
-                            themeProvider.isDarkMode
-                                ? 'Dark Mode'
-                                : 'Light Mode',
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12,
+                          const SizedBox(height: 10),
+                          TextButton(
+                            onPressed: _showEditProfileDialog,
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              foregroundColor: isDark
+                                  ? Colors.green[200]
+                                  : const Color(0xffA0C878),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Switch(
-                      value: themeProvider.isDarkMode,
-                      onChanged: (value) => themeProvider.toggleTheme(value),
-                      inactiveThumbColor: const Color(0xffA0C878),
-                      activeTrackColor: const Color(0xffCBF3BB),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              // Notification switch
-              Container(
-                width: double.infinity,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    Icon(
-                      isSounding
-                          ? Icons.notifications_active
-                          : Icons.notifications_off,
-                      color: isSounding
-                          ? const Color(0xffABE7B2)
-                          : const Color(0xffB7B89F),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Notification',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text(
-                            isSounding
-                                ? "Notification's on"
-                                : "Notification's off",
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12,
+                            child: const Text(
+                              'Edit Profile',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Switch(
-                      value: isSounding,
-                      onChanged: (value) => updateNotificationStatus(value),
-                      inactiveThumbColor: const Color(0xffA0C878),
-                      activeTrackColor: const Color(0xffCBF3BB),
-                    ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 18),
-              Divider(color: Colors.green.shade200, thickness: 1, height: 30),
+              const SizedBox(height: 40),
+              Text(
+                'Settings',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
+              ),
+              const SizedBox(height: 16),
 
-              // About section
+              // 🌗 Theme toggle
+              _buildSettingCard(
+                isDark: isDark,
+                icon: themeProvider.isDarkMode
+                    ? Icons.dark_mode
+                    : Icons.sunny,
+                iconColor: themeProvider.isDarkMode
+                    ? const Color(0xffB7B89F)
+                    : const Color(0xffABE7B2),
+                title: 'Theme',
+                subtitle: themeProvider.isDarkMode
+                    ? 'Dark Mode'
+                    : 'Light Mode',
+                trailing: Switch(
+                  value: themeProvider.isDarkMode,
+                  onChanged: (value) => themeProvider.toggleTheme(value),
+                  inactiveThumbColor: const Color(0xffA0C878),
+                  activeTrackColor: const Color(0xffCBF3BB),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // 🔔 Notification toggle
+              _buildSettingCard(
+                isDark: isDark,
+                icon: isSounding
+                    ? Icons.notifications_active
+                    : Icons.notifications_off,
+                iconColor: isSounding
+                    ? const Color(0xffABE7B2)
+                    : const Color(0xffB7B89F),
+                title: 'Notification',
+                subtitle:
+                    isSounding ? "Notification's on" : "Notification's off",
+                trailing: Switch(
+                  value: isSounding,
+                  onChanged: (value) => updateNotificationStatus(value),
+                  inactiveThumbColor: const Color(0xffA0C878),
+                  activeTrackColor: const Color(0xffCBF3BB),
+                ),
+              ),
+
               const SizedBox(height: 20),
-              Center(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 20, horizontal: 16),
-                    elevation: 0,
-                    minimumSize: const Size(double.infinity, 0),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AboutAgreen()),
-                    );
-                  },
-                  child: const Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(Icons.info, color: Color(0xffCBF3BB)),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'About aGreen',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Version 1.0.0',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              Divider(
+                color: isDark ? Colors.green[900] : Colors.green.shade200,
+                thickness: 1,
+                height: 30,
               ),
 
-              const SizedBox(height: 30),
+              // ℹ️ About
+              const SizedBox(height: 20),
+              _buildAboutCard(isDark, context),
 
-              // Logout
+              const SizedBox(height: 40),
+
+              // 🚪 Logout
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -451,6 +354,88 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // 🌿 Reusable Setting Card
+  Widget _buildSettingCard({
+    required bool isDark,
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required Widget trailing,
+  }) {
+    return Container(
+      width: double.infinity,
+      height: 70,
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[850] : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          Icon(icon, color: iconColor),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: isDark ? Colors.grey[400] : Colors.grey,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          trailing,
+        ],
+      ),
+    );
+  }
+
+  // ℹ️ About section card
+  Widget _buildAboutCard(bool isDark, BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[850] : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        leading: Icon(Icons.info, color: isDark ? Colors.green[200] : const Color(0xffCBF3BB)),
+        title: Text(
+          'About aGreen',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white : Colors.black,
+          ),
+        ),
+        subtitle: Text(
+          'Version 1.0.0',
+          style: TextStyle(
+            color: isDark ? Colors.grey[400] : Colors.grey,
+          ),
+        ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AboutAgreen()),
+          );
+        },
       ),
     );
   }
