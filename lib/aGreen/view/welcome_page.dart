@@ -21,7 +21,6 @@ class _WelcomePageState extends State<WelcomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(height: 50),
-              //Image.asset
               SizedBox(height: 30),
               Text(
                 'aGreen',

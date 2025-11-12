@@ -185,7 +185,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
               ),
               const SizedBox(height: 30),
 
-              // 🌿 Profile Card
+              //Profile Card
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -272,7 +272,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
               ),
               const SizedBox(height: 16),
 
-              // 🌗 Theme toggle
+              //Theme toggle
               _buildSettingCard(
                 isDark: isDark,
                 icon: themeProvider.isDarkMode
@@ -295,7 +295,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
 
               const SizedBox(height: 16),
 
-              // 🔔 Notification toggle
+              //Notification toggle
               _buildSettingCard(
                 isDark: isDark,
                 icon: isSounding
@@ -322,13 +322,13 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                 height: 30,
               ),
 
-              // ℹ️ About
+              //About
               const SizedBox(height: 20),
               _buildAboutCard(isDark, context),
 
               const SizedBox(height: 40),
 
-              // 🚪 Logout
+              //Logout
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -358,7 +358,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
     );
   }
 
-  // 🌿 Reusable Setting Card
+  //Reusable Setting Card
   Widget _buildSettingCard({
     required bool isDark,
     required IconData icon,
@@ -407,7 +407,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
     );
   }
 
-  // ℹ️ About section card
+  //About section card
   Widget _buildAboutCard(bool isDark, BuildContext context) {
     return Container(
       decoration: BoxDecoration(
@@ -425,7 +425,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
           ),
         ),
         subtitle: Text(
-          'Version 1.0.0',
+          'Version 2.0.0',
           style: TextStyle(
             color: isDark ? Colors.grey[400] : Colors.grey,
           ),

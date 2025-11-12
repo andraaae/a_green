@@ -37,7 +37,6 @@ class _RegisterAgreenState extends State<RegisterAgreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
 
                   children: [
-                    //Image.asset(''),
                     SizedBox(height: 20),
                     Text('Register now', style: TextStyle(fontSize: 20)),
 

@@ -96,7 +96,7 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
               ),
               const SizedBox(height: 20),
 
-              // 🔔 Toggle notification container
+              //Toggle notification container
               Container(
                 width: double.infinity,
                 height: 70,
@@ -164,7 +164,7 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
               ),
               const SizedBox(height: 12),
 
-              // 🌿 List tanaman
+              //List tanaman
               Container(
                 padding: const EdgeInsets.all(8),
                 width: double.infinity,

@@ -67,12 +67,15 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
   }
 
   void showUpdateDialog(PlantModel plant) {
-    final TextEditingController nameController =
-        TextEditingController(text: plant.name);
-    final TextEditingController typeController =
-        TextEditingController(text: plant.plant);
-    final TextEditingController frequencyController =
-        TextEditingController(text: plant.frequency);
+    final TextEditingController nameController = TextEditingController(
+      text: plant.name,
+    );
+    final TextEditingController typeController = TextEditingController(
+      text: plant.plant,
+    );
+    final TextEditingController frequencyController = TextEditingController(
+      text: plant.frequency,
+    );
 
     showDialog(
       context: context,
@@ -93,8 +96,9 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
               ),
               TextField(
                 controller: frequencyController,
-                decoration:
-                    const InputDecoration(labelText: 'Watering Frequency'),
+                decoration: const InputDecoration(
+                  labelText: 'Watering Frequency',
+                ),
               ),
             ],
           ),
@@ -143,9 +147,7 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Delete'),
           ),
@@ -174,8 +176,7 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
 
     final cardColor = isDark ? Colors.grey[850] : Colors.white;
     final textColor = isDark ? Colors.grey[200] : const Color(0xff748873);
-    final subTextColor =
-        isDark ? Colors.grey[400] : const Color(0xff748873);
+    final subTextColor = isDark ? Colors.grey[400] : const Color(0xff748873);
 
     return Scaffold(
       body: Padding(
@@ -190,10 +191,7 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                   ? const CircularProgressIndicator()
                   : Text(
                       'Hello, ${dataUser?.username ?? ""}!',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: textColor,
-                      ),
+                      style: TextStyle(fontSize: 20, color: textColor),
                     ),
               const SizedBox(height: 10),
               Text(
@@ -219,7 +217,7 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                           color: Colors.grey.withOpacity(0.2),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
-                        )
+                        ),
                     ],
                   ),
                   child: userPlants == null || userPlants!.isEmpty
@@ -250,9 +248,14 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(data.plant, style: TextStyle(color: subTextColor)),
-                                  Text('Watering frequency: ${data.frequency}',
-                                      style: TextStyle(color: subTextColor)),
+                                  Text(
+                                    data.plant,
+                                    style: TextStyle(color: subTextColor),
+                                  ),
+                                  Text(
+                                    'Watering frequency: ${data.frequency}',
+                                    style: TextStyle(color: subTextColor),
+                                  ),
                                   const SizedBox(height: 4),
                                   LinearProgressIndicator(
                                     value: progress,
@@ -260,14 +263,16 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                                     backgroundColor: isDark
                                         ? Colors.grey[700]
                                         : const Color(0x80A6AD88),
-                                    valueColor:
-                                        AlwaysStoppedAnimation<Color>(
-                                            const Color(0xffA6AD88)),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      const Color(0xffA6AD88),
+                                    ),
                                   ),
                                   Text(
                                     'Progress: $progressPercent%',
                                     style: TextStyle(
-                                        fontSize: 12, color: subTextColor),
+                                      fontSize: 12,
+                                      color: subTextColor,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -275,13 +280,16 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    icon:
-                                        const Icon(Icons.water_drop, size: 18),
+                                    icon: const Icon(
+                                      Icons.water_drop,
+                                      size: 18,
+                                    ),
                                     color: canWater
                                         ? const Color(0xffA6D8A8)
                                         : Colors.grey.shade500,
-                                    onPressed:
-                                        canWater ? () => waterPlant(data) : null,
+                                    onPressed: canWater
+                                        ? () => waterPlant(data)
+                                        : null,
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.edit, size: 18),

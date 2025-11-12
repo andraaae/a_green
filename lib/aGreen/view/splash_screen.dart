@@ -11,26 +11,36 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  double _opacity = 0.0;
+
   @override
   void initState() {
     super.initState();
+    _startAnimation();
     isLoginFunction();
   }
 
-  isLoginFunction() async {
-    Future.delayed(Duration(seconds: 3)).then((value) async {
+  void _startAnimation() {
+    //Animasi fade-in
+    Future.delayed(const Duration(milliseconds: 300), () {
+      setState(() => _opacity = 1.0);
+    });
+  }
+
+  void isLoginFunction() async {
+    //Delay 3 detik
+    Future.delayed(const Duration(seconds: 3)).then((value) async {
       var isLogin = await PreferenceHandler.getLogin();
-      print(isLogin);
       if (isLogin != null && isLogin == true) {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => HomePageAgreen()),
+          MaterialPageRoute(builder: (context) => const HomePageAgreen()),
           (route) => false,
         );
       } else {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => LoginAgreen()),
+          MaterialPageRoute(builder: (context) => const LoginAgreen()),
           (route) => false,
         );
       }
@@ -42,21 +52,43 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: const Color(0xffCBF3BB),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            /// Icon/logo di tengah
-            Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
+        child: AnimatedOpacity(
+          duration: const Duration(seconds: 2),
+          opacity: _opacity,
+          curve: Curves.easeInOut,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              //Logo
+              Container(
+                width: 200,
+                height: 200,
+                decoration: const BoxDecoration(),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Image.asset('assets/images/aGreen.jpg'),
+                ),
               ),
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Image.asset('assets/images/aGreen.jpg'),
-                )
-            ),
-          ],
+
+              const SizedBox(height: 30),
+
+              //Loading indikator
+              const CircularProgressIndicator(
+                color: Color(0xff658C58),
+                strokeWidth: 3,
+              ),
+
+              const SizedBox(height: 20),
+              const Text(
+                "Loading...",
+                style: TextStyle(
+                  color: Color(0xff658C58),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

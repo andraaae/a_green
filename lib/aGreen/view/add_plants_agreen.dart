@@ -155,7 +155,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // PLANT NAME
+                //PLANT NAME
                 _buildLabel("Plant's Name", isDark),
                 _buildTextField(
                   controller: plantname,
@@ -163,7 +163,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                   theme: theme,
                 ),
 
-                // TYPE OF PLANT
+                //TYPE OF PLANT
                 const SizedBox(height: 30),
                 _buildLabel("Type of Plant", isDark),
                 _buildDropdown(
@@ -174,7 +174,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                   theme: theme,
                 ),
 
-                // FREQUENCY
+                //FREQUENCY
                 const SizedBox(height: 30),
                 _buildLabel("Watering Frequency", isDark),
                 _buildDropdown(
@@ -186,7 +186,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                   theme: theme,
                 ),
 
-                // LAST WATERED DATE
+                //LAST WATERED DATE
                 const SizedBox(height: 30),
                 _buildLabel("Last Watered Date", isDark),
                 GestureDetector(
@@ -223,7 +223,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
 
                 const SizedBox(height: 45),
 
-                // SAVE BUTTON
+                //SAVE BUTTON
                 ElevatedButton(
                   onPressed: () async {
                     if (!formKey.currentState!.validate()) return;

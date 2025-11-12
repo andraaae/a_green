@@ -14,6 +14,10 @@ class JournalPageAgreen extends StatefulWidget {
 class _JournalPageAgreenState extends State<JournalPageAgreen> {
   UserModel? dataUser;
   List<PlantModel>? userPlants = [];
+  List<PlantModel>? filteredPlants = [];
+
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = "";
 
   @override
   void initState() {
@@ -29,8 +33,27 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
       setState(() {
         dataUser = result;
         userPlants = plantsData;
+        filteredPlants = plantsData; // inisialisasi awal
       });
     }
+  }
+
+  void _filterPlants(String query) {
+    setState(() {
+      _searchQuery = query;
+      if (query.isEmpty) {
+        filteredPlants = userPlants;
+      } else {
+        filteredPlants = userPlants!
+            .where(
+              (plant) =>
+                  plant.name.toLowerCase().contains(query.toLowerCase()) ||
+                  plant.plant.toLowerCase().contains(query.toLowerCase()) ||
+                  plant.frequency.toLowerCase().contains(query.toLowerCase()),
+            )
+            .toList();
+      }
+    });
   }
 
   @override
@@ -65,7 +88,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
               ),
               const SizedBox(height: 30),
 
-              // 🌱 Total plant summary
+              //Total plant summary
               Center(
                 child: Container(
                   width: 220,
@@ -91,8 +114,9 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color:
-                              isDark ? Colors.green[200] : const Color(0xff658C58),
+                          color: isDark
+                              ? Colors.green[200]
+                              : const Color(0xff658C58),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -119,7 +143,26 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
               ),
               const SizedBox(height: 14),
 
-              // 🌿 Plant list
+              //Search bar
+              TextField(
+                controller: _searchController,
+                onChanged: _filterPlants,
+                decoration: InputDecoration(
+                  hintText: "Search plant name or type...",
+                  prefixIcon: const Icon(Icons.search),
+                  filled: true,
+                  fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              ),
+
+              const SizedBox(height: 16),
+
+              //Plant list
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -128,58 +171,59 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                 ),
                 child: userPlants == null
                     ? const Center(child: CircularProgressIndicator())
-                    : userPlants!.isEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: Center(
-                              child: Text(
-                                "No plants yet 🌱",
+                    : filteredPlants!.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Center(
+                          child: Text(
+                            _searchQuery.isEmpty
+                                ? "No plants yet 🌱"
+                                : "No match found 🌿",
+                            style: TextStyle(
+                              color: isDark
+                                  ? Colors.grey[400]
+                                  : Colors.grey[700],
+                            ),
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: filteredPlants!.length,
+                        itemBuilder: (context, index) {
+                          final data = filteredPlants![index];
+                          return Card(
+                            color: isDark ? Colors.grey[900] : Colors.grey[50],
+                            elevation: 3,
+                            margin: const EdgeInsets.symmetric(vertical: 6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              title: Text(
+                                data.name,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark
+                                      ? Colors.white
+                                      : const Color(0xff334433),
+                                ),
+                              ),
+                              subtitle: Text(
+                                "Type: ${data.plant}\nFrequency: ${data.frequency}",
                                 style: TextStyle(
                                   color: isDark
                                       ? Colors.grey[400]
                                       : Colors.grey[700],
                                 ),
                               ),
+                              isThreeLine: true,
+                              onTap: () => _showJournalSheet(context, data),
                             ),
-                          )
-                        : ListView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: userPlants!.length,
-                            itemBuilder: (context, index) {
-                              final data = userPlants![index];
-                              return Card(
-                                color: isDark ? Colors.grey[900] : Colors.grey[50],
-                                elevation: 3,
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 6),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: ListTile(
-                                  title: Text(
-                                    data.name,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark
-                                          ? Colors.white
-                                          : const Color(0xff334433),
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    "Type: ${data.plant}\nFrequency: ${data.frequency}",
-                                    style: TextStyle(
-                                      color: isDark
-                                          ? Colors.grey[400]
-                                          : Colors.grey[700],
-                                    ),
-                                  ),
-                                  isThreeLine: true,
-                                  onTap: () => _showJournalSheet(context, data),
-                                ),
-                              );
-                            },
-                          ),
+                          );
+                        },
+                      ),
               ),
             ],
           ),
@@ -188,7 +232,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
     );
   }
 
-  // ✍️ Bottom sheet for journaling
+  //Bottom sheet untuk journaling
   void _showJournalSheet(BuildContext context, PlantModel data) {
     final TextEditingController controller = TextEditingController();
     final theme = Theme.of(context);
@@ -225,7 +269,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                "Catatan untuk ${data.name}",
+                "Journal for ${data.name}",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.green[200] : const Color(0xff658C58),
@@ -237,20 +281,20 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                 controller: controller,
                 maxLines: 5,
                 decoration: InputDecoration(
-                  hintText: "Tulis perkembangan ${data.name} di sini...",
+                  hintText: "Write down ${data.name}'s progress here...",
                   hintStyle: TextStyle(
                     color: isDark ? Colors.grey[500] : Colors.grey[600],
                   ),
                   filled: true,
-                  fillColor: isDark ? Colors.grey[850] : const Color(0xffF7F7F7),
+                  fillColor: isDark
+                      ? Colors.grey[850]
+                      : const Color(0xffF7F7F7),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
                 ),
-                style: TextStyle(
-                  color: isDark ? Colors.white : Colors.black,
-                ),
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
               ),
               const SizedBox(height: 14),
               ElevatedButton(
@@ -263,14 +307,15 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isDark ? Colors.green[300] : const Color(0xff658C58),
+                  backgroundColor: isDark
+                      ? Colors.green[300]
+                      : const Color(0xff658C58),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text("Simpan"),
+                child: const Text("Save"),
               ),
             ],
           ),
@@ -279,7 +324,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
     );
   }
 
-  // 🌿 Confirmation dialog
+  //Confirmation dialog
   void _showSaveDialog(BuildContext context, String plantName) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -288,27 +333,23 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: isDark ? Colors.grey[900] : Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         title: Text(
-          "Catatan tersimpan! 🌿",
+          "Journal saved! 🌿",
           style: TextStyle(
             color: isDark ? Colors.green[200] : const Color(0xff658C58),
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
-          "$plantName sudah dicatat perkembangannya.",
-          style: TextStyle(
-            color: isDark ? Colors.grey[300] : Colors.grey[800],
-          ),
+          "$plantName progress has been recorded.",
+          style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[800]),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              "Oke",
+              "OK",
               style: TextStyle(
                 color: isDark ? Colors.green[200] : const Color(0xff658C58),
               ),

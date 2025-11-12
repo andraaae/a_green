@@ -5,9 +5,10 @@ class PreferenceHandler {
   static const String isLogin = "isLogin";
   static const String isId = "isId";
   static const String plantList = "plantList";
-  static const String notifStatus = "notificationStatus"; // 🆕 key untuk notifikasi
+  static const String notifStatus =
+      "notificationStatus"; // 🆕 key untuk notifikasi
 
-  // ======== LOGIN HANDLER ========
+  //LOGIN HANDLER
 
   static saveLogin(bool value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -24,7 +25,7 @@ class PreferenceHandler {
     prefs.remove(isLogin);
   }
 
-  // ======== ID HANDLER ========
+  //ID HANDLER
 
   static saveId(int value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -67,7 +68,7 @@ class PreferenceHandler {
     prefs.remove(plantList);
   }
 
-  // ======== NOTIFICATION HANDLER 🆕 ========
+  //NOTIFICATION HANDLER
 
   static Future<void> setNotificationEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();

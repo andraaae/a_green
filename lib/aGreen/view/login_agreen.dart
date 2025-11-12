@@ -186,14 +186,6 @@ class _LoginAgreenState extends State<LoginAgreen> {
                           password: password,
                         );
                         if (user != null) {
-                          // Navigator.pushReplacement(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => HomePageAgreen(),
-                          //   ),
-                          // );
-                          // print('Register Success for ${emailController.text}');
-
                           //pindah ke halamamn home
                           Navigator.pushReplacement(
                             context,
@@ -229,7 +221,6 @@ class _LoginAgreenState extends State<LoginAgreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          // Navigator.of(context).pop();
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
