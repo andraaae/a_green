@@ -9,7 +9,6 @@ class PreferenceHandler {
       "notificationStatus"; // 🆕 key untuk notifikasi
 
   //LOGIN HANDLER
-
   static saveLogin(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool(isLogin, value);
@@ -26,7 +25,6 @@ class PreferenceHandler {
   }
 
   //ID HANDLER
-
   static saveId(int value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setInt(isId, value);
@@ -43,7 +41,6 @@ class PreferenceHandler {
   }
 
   //TANAMAN HANDLER
-
   static savePlants(List<PlantModel> plants) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> plantJsonList = plants.map((plant) => plant.toJson()).toList();
@@ -69,7 +66,6 @@ class PreferenceHandler {
   }
 
   //NOTIFICATION HANDLER
-
   static Future<void> setNotificationEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(notifStatus, value);
