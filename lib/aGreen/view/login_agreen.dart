@@ -1,5 +1,6 @@
 import 'package:a_green/aGreen/bottom_navigation/buttom_navigation_agreen.dart';
 import 'package:a_green/aGreen/database/db_helper.dart';
+import 'package:a_green/aGreen/database/preferrence.dart';
 import 'package:a_green/aGreen/view/register_agreen.dart';
 import 'package:flutter/material.dart';
 
@@ -187,6 +188,7 @@ class _LoginAgreenState extends State<LoginAgreen> {
                         );
                         if (user != null) {
                           //pindah ke halamamn home
+                          await PreferenceHandler.saveLogin(true);
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(

@@ -1,3 +1,4 @@
+import 'package:a_green/aGreen/bottom_navigation/buttom_navigation_agreen.dart';
 import 'package:a_green/aGreen/database/preferrence.dart';
 import 'package:a_green/aGreen/view/home_page_agreen.dart';
 import 'package:a_green/aGreen/view/login_agreen.dart';
@@ -34,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (isLogin != null && isLogin == true) {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const HomePageAgreen()),
+          MaterialPageRoute(builder: (context) => const ButtomNavigationAgreen()),
           (route) => false,
         );
       } else {
