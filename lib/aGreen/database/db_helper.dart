@@ -1,6 +1,7 @@
 import 'package:a_green/aGreen/database/preferrence.dart';
 import 'package:a_green/aGreen/models/plant_model.dart';
 import 'package:a_green/aGreen/models/user_model.dart';
+import 'package:a_green/aGreen/models/journal_model.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -8,12 +9,13 @@ class DbHelper {
   static const String _dbName = 'a_Green.db';
   static const tableUser = 'Users';
   static const tablePlants = 'Plants';
+  static const tableJournal = 'Journal';
 
   static Future<Database> db() async {
     final dbPath = await getDatabasesPath();
     return openDatabase(
       join(dbPath, _dbName),
-      version: 2,
+      version: 3, // 🔹 Naikkan versi agar tabel Journal ikut dibuat
       onCreate: (db, version) async {
         await db.execute(
           "CREATE TABLE $tableUser(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, email TEXT, password TEXT, phone TEXT, address TEXT)",
@@ -28,6 +30,17 @@ class DbHelper {
           "lastWateredDate TEXT, "
           "userId INTEGER NOT NULL)",
         );
+
+        // 🔹 Buat tabel Journal baru
+        await db.execute(
+          "CREATE TABLE $tableJournal("
+          "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+          "user_id INTEGER NOT NULL, "
+          "title TEXT, "
+          "content TEXT, "
+          "date TEXT)",
+        );
+
         print("Tables created successfully");
       },
       onUpgrade: (db, oldVersion, newVersion) async {
@@ -36,11 +49,24 @@ class DbHelper {
               "ALTER TABLE $tablePlants ADD COLUMN lastWateredDate TEXT");
           print("Column 'lastWateredDate' added");
         }
+
+        // 🔹 Jika versi lama belum punya tabel Journal
+        if (oldVersion < 3) {
+          await db.execute(
+            "CREATE TABLE $tableJournal("
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+            "user_id INTEGER NOT NULL, "
+            "title TEXT, "
+            "content TEXT, "
+            "date TEXT)",
+          );
+          print("Table 'Journal' added");
+        }
       },
     );
   }
 
-  //USER METHODS
+  // ========================= USER METHODS =========================
   static Future<void> registerUser(UserModel user) async {
     final dbs = await db();
     await dbs.insert(
@@ -98,7 +124,7 @@ class DbHelper {
     return null;
   }
 
-  //PLANT METHODS
+  // ========================= PLANT METHODS =========================
   static Future<void> addPlant(PlantModel plant) async {
     final dbInstance = await db();
     await dbInstance.insert(
@@ -145,14 +171,10 @@ class DbHelper {
     await dbInstance.delete(tablePlants, where: 'id = ?', whereArgs: [id]);
   }
 
- 
-  //Tambahan logika untuk progress & alert penyiraman
- 
-
-  /// Menghitung progress penyiraman tanaman (0.0 - 1.0)
+  // ========================= WATERING LOGIC =========================
   static double calculateWateringProgress(PlantModel plant) {
     if (plant.lastWateredDate == null || plant.frequency.isEmpty) {
-      return 1.0; // default full progress (butuh disiram)
+      return 1.0;
     }
 
     DateTime lastWatered = DateTime.parse(plant.lastWateredDate!);
@@ -163,13 +185,11 @@ class DbHelper {
     return progress;
   }
 
-  /// Mengecek apakah tanaman sudah waktunya disiram
   static bool isWateringDue(PlantModel plant) {
     double progress = calculateWateringProgress(plant);
     return progress >= 1.0;
   }
 
-  /// Mengubah teks frekuensi jadi jumlah hari
   static int _getFrequencyInDays(String frequency) {
     frequency = frequency.toLowerCase();
     if (frequency.contains("hari")) return 1;
@@ -177,6 +197,55 @@ class DbHelper {
     if (frequency.contains("4-6 hari")) return 6;
     if (frequency.contains("1-2 minggu")) return 14;
     if (frequency.contains("3-4 minggu")) return 28;
-    return 7; // default seminggu
+    return 7;
+  }
+
+  // ========================= JOURNAL METHODS =========================
+  static Future<void> addJournal(JournalModel journal) async {
+    final dbInstance = await db();
+    await dbInstance.insert(
+      tableJournal,
+      journal.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  static Future<List<JournalModel>> getJournalsByUser(int userId) async {
+    final dbInstance = await db();
+    final results = await dbInstance.query(
+      tableJournal,
+      where: 'user_id = ?',
+      whereArgs: [userId],
+      orderBy: 'date DESC',
+    );
+    return results.map((e) => JournalModel.fromMap(e)).toList();
+  }
+
+  static Future<List<JournalModel>> getJournalsByDate(
+      int userId, String date) async {
+    final dbInstance = await db();
+    final results = await dbInstance.query(
+      tableJournal,
+      where: 'user_id = ? AND date = ?',
+      whereArgs: [userId, date],
+      orderBy: 'id DESC',
+    );
+    return results.map((e) => JournalModel.fromMap(e)).toList();
+  }
+
+  static Future<void> updateJournal(JournalModel journal) async {
+    final dbInstance = await db();
+    await dbInstance.update(
+      tableJournal,
+      journal.toMap(),
+      where: 'id = ?',
+      whereArgs: [journal.id],
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  static Future<void> deleteJournal(int id) async {
+    final dbInstance = await db();
+    await dbInstance.delete(tableJournal, where: 'id = ?', whereArgs: [id]);
   }
 }

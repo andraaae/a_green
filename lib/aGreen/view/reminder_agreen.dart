@@ -70,14 +70,13 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(8.0),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 45),
+              const SizedBox(height: 15),
               Text(
                 'Reminder',
                 style: TextStyle(
@@ -96,7 +95,7 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
               ),
               const SizedBox(height: 20),
 
-              //Toggle notification container
+              // Toggle notification container
               Container(
                 width: double.infinity,
                 height: 70,
@@ -153,7 +152,7 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 30),
 
               Text(
                 'Upcoming Schedule',
@@ -164,118 +163,121 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
               ),
               const SizedBox(height: 12),
 
-              //List tanaman
-              Container(
-                padding: const EdgeInsets.all(8),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.grey[850] : Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: userPlants == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : userPlants!.isEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: Center(
-                              child: Text(
-                                'No plants yet 🌱',
-                                style: TextStyle(
-                                  color: isDark
-                                      ? Colors.grey[400]
-                                      : Colors.grey[700],
+              // Container list scrollable
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey[850] : Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: userPlants == null
+                      ? const Center(child: CircularProgressIndicator())
+                      : userPlants!.isEmpty
+                          ? Padding(
+                              padding: const EdgeInsets.all(24.0),
+                              child: Center(
+                                child: Text(
+                                  'No plants yet 🌱',
+                                  style: TextStyle(
+                                    color: isDark
+                                        ? Colors.grey[400]
+                                        : Colors.grey[700],
+                                  ),
                                 ),
                               ),
-                            ),
-                          )
-                        : ListView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: userPlants!.length,
-                            itemBuilder: (context, index) {
-                              final data = userPlants![index];
-                              final shouldWater = isTimeToWater(
-                                  data.lastWateredDate, data.frequency);
+                            )
+                          : ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: userPlants!.length,
+                              itemBuilder: (context, index) {
+                                final data = userPlants![index];
+                                final shouldWater = isTimeToWater(
+                                    data.lastWateredDate, data.frequency);
 
-                              return Card(
-                                color: isDark
-                                    ? Colors.grey[900]
-                                    : Colors.grey[50],
-                                elevation: 3,
-                                margin: const EdgeInsets.only(bottom: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  data.name,
-                                                  style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: isDark
-                                                        ? Colors.white
-                                                        : Colors.black,
+                                return Card(
+                                  color: isDark
+                                      ? Colors.grey[900]
+                                      : Colors.grey[50],
+                                  elevation: 3,
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    data.name,
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: isDark
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                    ),
                                                   ),
-                                                ),
-                                                if (shouldWater)
-                                                  const Icon(
-                                                    Icons.warning_amber_rounded,
-                                                    color: Colors.redAccent,
-                                                  ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Text(
-                                              data.plant,
-                                              style: TextStyle(
-                                                color: isDark
-                                                    ? Colors.grey[400]
-                                                    : Colors.grey[800],
+                                                  if (shouldWater)
+                                                    const Icon(
+                                                      Icons
+                                                          .warning_amber_rounded,
+                                                      color: Colors.redAccent,
+                                                    ),
+                                                ],
                                               ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              'Frequency: ${data.frequency}',
-                                              style: TextStyle(
-                                                color: isDark
-                                                    ? Colors.grey[500]
-                                                    : Colors.grey[600],
-                                              ),
-                                            ),
-                                            if (data.lastWateredDate != null)
+                                              const SizedBox(height: 8),
                                               Text(
-                                                'Last watered: ${DateFormat('dd MMM yyyy').format(DateTime.parse(data.lastWateredDate!))}',
+                                                data.plant,
+                                                style: TextStyle(
+                                                  color: isDark
+                                                      ? Colors.grey[400]
+                                                      : Colors.grey[800],
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                'Frequency: ${data.frequency}',
                                                 style: TextStyle(
                                                   color: isDark
                                                       ? Colors.grey[500]
-                                                      : Colors.grey,
-                                                  fontSize: 12,
+                                                      : Colors.grey[600],
                                                 ),
                                               ),
-                                          ],
+                                              if (data.lastWateredDate != null)
+                                                Text(
+                                                  'Last watered: ${DateFormat('dd MMM yyyy').format(DateTime.parse(data.lastWateredDate!))}',
+                                                  style: TextStyle(
+                                                    color: isDark
+                                                        ? Colors.grey[500]
+                                                        : Colors.grey,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
+                                );
+                              },
+                            ),
+                ),
               ),
             ],
           ),

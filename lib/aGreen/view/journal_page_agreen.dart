@@ -2,7 +2,9 @@ import 'package:a_green/aGreen/database/db_helper.dart';
 import 'package:a_green/aGreen/database/preferrence.dart';
 import 'package:a_green/aGreen/models/plant_model.dart';
 import 'package:a_green/aGreen/models/user_model.dart';
+import 'package:a_green/aGreen/models/journal_model.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class JournalPageAgreen extends StatefulWidget {
   const JournalPageAgreen({super.key});
@@ -15,6 +17,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
   UserModel? dataUser;
   List<PlantModel>? userPlants = [];
   List<PlantModel>? filteredPlants = [];
+  Map<int, JournalModel?> lastJournalMap = {}; // simpan catatan terakhir tiap tanaman
 
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = "";
@@ -30,10 +33,29 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
     if (id != null) {
       UserModel? result = await DbHelper.getUser(id);
       List<PlantModel> plantsData = await DbHelper.getPlantsByUser(id);
+
+      Map<int, JournalModel?> lastJournalTemp = {};
+      for (var plant in plantsData) {
+        var journals = await DbHelper.getJournalsByDate(
+          id,
+          DateFormat('yyyy-MM-dd').format(DateTime.now()),
+        );
+
+        JournalModel? lastJournal;
+        try {
+          lastJournal = journals.firstWhere((j) => j.title == plant.name);
+        } catch (e) {
+          lastJournal = null;
+        }
+
+        lastJournalTemp[plant.id ?? 0] = lastJournal;
+      }
+
       setState(() {
         dataUser = result;
         userPlants = plantsData;
-        filteredPlants = plantsData; // inisialisasi awal
+        filteredPlants = plantsData;
+        lastJournalMap = lastJournalTemp;
       });
     }
   }
@@ -63,8 +85,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
+        child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +109,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
               ),
               const SizedBox(height: 30),
 
-              //Total plant summary
+              // Summary Card
               Center(
                 child: Container(
                   width: 220,
@@ -114,9 +135,8 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: isDark
-                              ? Colors.green[200]
-                              : const Color(0xff658C58),
+                          color:
+                              isDark ? Colors.green[200] : const Color(0xff658C58),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -143,7 +163,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
               ),
               const SizedBox(height: 14),
 
-              //Search bar
+              // Search bar
               TextField(
                 controller: _searchController,
                 onChanged: _filterPlants,
@@ -162,68 +182,92 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
 
               const SizedBox(height: 16),
 
-              //Plant list
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.grey[850] : Colors.white,
-                  borderRadius: BorderRadius.circular(15),
+              // Container berisi list scrollable
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey[850] : Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: userPlants == null
+                      ? const Center(child: CircularProgressIndicator())
+                      : filteredPlants!.isEmpty
+                          ? Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: Text(
+                                  _searchQuery.isEmpty
+                                      ? "No plants yet 🌱"
+                                      : "No match found 🌿",
+                                  style: TextStyle(
+                                    color: isDark
+                                        ? Colors.grey[400]
+                                        : Colors.grey[700],
+                                  ),
+                                ),
+                              ),
+                            )
+                          : ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: filteredPlants!.length,
+                              itemBuilder: (context, index) {
+                                final data = filteredPlants![index];
+                                final lastJournal = lastJournalMap[data.id ?? 0];
+
+                                return Card(
+                                  color:
+                                      isDark ? Colors.grey[900] : Colors.grey[50],
+                                  elevation: 3,
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 6),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: ListTile(
+                                    title: Text(
+                                      data.name,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: isDark
+                                            ? Colors.white
+                                            : const Color(0xff334433),
+                                      ),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Type: ${data.plant}\nFrequency: ${data.frequency}",
+                                          style: TextStyle(
+                                            color: isDark
+                                                ? Colors.grey[400]
+                                                : Colors.grey[700],
+                                          ),
+                                        ),
+                                        if (lastJournal != null)
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 4.0),
+                                            child: Text(
+                                              "Last note: ${lastJournal.content}\n(${lastJournal.date})",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: isDark
+                                                    ? Colors.grey[500]
+                                                    : Colors.grey[600],
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    isThreeLine: lastJournal != null,
+                                    onTap: () => _showJournalSheet(context, data),
+                                  ),
+                                );
+                              },
+                            ),
                 ),
-                child: userPlants == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : filteredPlants!.isEmpty
-                    ? Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Center(
-                          child: Text(
-                            _searchQuery.isEmpty
-                                ? "No plants yet 🌱"
-                                : "No match found 🌿",
-                            style: TextStyle(
-                              color: isDark
-                                  ? Colors.grey[400]
-                                  : Colors.grey[700],
-                            ),
-                          ),
-                        ),
-                      )
-                    : ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: filteredPlants!.length,
-                        itemBuilder: (context, index) {
-                          final data = filteredPlants![index];
-                          return Card(
-                            color: isDark ? Colors.grey[900] : Colors.grey[50],
-                            elevation: 3,
-                            margin: const EdgeInsets.symmetric(vertical: 6),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: ListTile(
-                              title: Text(
-                                data.name,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? Colors.white
-                                      : const Color(0xff334433),
-                                ),
-                              ),
-                              subtitle: Text(
-                                "Type: ${data.plant}\nFrequency: ${data.frequency}",
-                                style: TextStyle(
-                                  color: isDark
-                                      ? Colors.grey[400]
-                                      : Colors.grey[700],
-                                ),
-                              ),
-                              isThreeLine: true,
-                              onTap: () => _showJournalSheet(context, data),
-                            ),
-                          );
-                        },
-                      ),
               ),
             ],
           ),
@@ -232,7 +276,6 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
     );
   }
 
-  //Bottom sheet untuk journaling
   void _showJournalSheet(BuildContext context, PlantModel data) {
     final TextEditingController controller = TextEditingController();
     final theme = Theme.of(context);
@@ -246,85 +289,104 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
       builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Container(
-                  width: 50,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[400],
-                    borderRadius: BorderRadius.circular(10),
+        return SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 20,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 50,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[400],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                "Journal for ${data.name}",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.green[200] : const Color(0xff658C58),
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: controller,
-                maxLines: 5,
-                decoration: InputDecoration(
-                  hintText: "Write down ${data.name}'s progress here...",
-                  hintStyle: TextStyle(
-                    color: isDark ? Colors.grey[500] : Colors.grey[600],
-                  ),
-                  filled: true,
-                  fillColor: isDark
-                      ? Colors.grey[850]
-                      : const Color(0xffF7F7F7),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+                const SizedBox(height: 16),
+                Text(
+                  "Journal for ${data.name}",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.green[200] : const Color(0xff658C58),
+                    fontSize: 16,
                   ),
                 ),
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-              ),
-              const SizedBox(height: 14),
-              ElevatedButton(
-                onPressed: () {
-                  final note = controller.text.trim();
-                  if (note.isNotEmpty) {
+                const SizedBox(height: 12),
+                TextField(
+                  controller: controller,
+                  maxLines: 5,
+                  decoration: InputDecoration(
+                    hintText: "Write down ${data.name}'s progress here...",
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.grey[500] : Colors.grey[600],
+                    ),
+                    filled: true,
+                    fillColor:
+                        isDark ? Colors.grey[850] : const Color(0xffF7F7F7),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                ),
+                const SizedBox(height: 14),
+                ElevatedButton(
+                  onPressed: () async {
+                    final note = controller.text.trim();
+                    if (note.isEmpty) return;
+
+                    FocusScope.of(context).unfocus(); // tutup keyboard
+
+                    final date =
+                        DateFormat('yyyy-MM-dd').format(DateTime.now());
+                    final userId = dataUser?.id ?? 0;
+
+                    final journal = JournalModel(
+                      userId: userId,
+                      title: data.name,
+                      content: note,
+                      date: date,
+                    );
+
+                    await DbHelper.addJournal(journal);
+
+                    setState(() {
+                      lastJournalMap[data.id ?? 0] = journal;
+                    });
+
+                    controller.clear(); // clear sebelum pop
                     Navigator.pop(context);
+
                     _showSaveDialog(context, data.name);
-                    controller.clear();
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isDark
-                      ? Colors.green[300]
-                      : const Color(0xff658C58),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        isDark ? Colors.green[300] : const Color(0xff658C58),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
+                  child: const Text("Save"),
                 ),
-                child: const Text("Save"),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
     );
   }
 
-  //Confirmation dialog
   void _showSaveDialog(BuildContext context, String plantName) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -333,7 +395,8 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: isDark ? Colors.grey[900] : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         title: Text(
           "Journal saved! 🌿",
           style: TextStyle(

@@ -37,7 +37,6 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
 
   double calculateProgress(PlantModel plant) {
     if (plant.lastWateredDate == null) return 0.0;
-
     final lastWatered = DateTime.tryParse(plant.lastWateredDate!);
     if (lastWatered == null) return 0.0;
 
@@ -46,7 +45,6 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
 
     final now = DateTime.now();
     final diffDays = now.difference(lastWatered).inDays;
-
     double progress = diffDays / freqDays;
     return progress.clamp(0.0, 1.0);
   }
@@ -61,57 +59,37 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
       frequency: plant.frequency,
       lastWateredDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
     );
-
     await DbHelper.updatePlant(updated);
     loadData();
   }
 
   void showUpdateDialog(PlantModel plant) {
-    final TextEditingController nameController = TextEditingController(
-      text: plant.name,
-    );
-    final TextEditingController typeController = TextEditingController(
-      text: plant.plant,
-    );
-    final TextEditingController frequencyController = TextEditingController(
-      text: plant.frequency,
-    );
+    final nameController = TextEditingController(text: plant.name);
+    final typeController = TextEditingController(text: plant.plant);
+    final frequencyController = TextEditingController(text: plant.frequency);
 
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          title: const Text('Edit Plant'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'Plant Name'),
-              ),
-              TextField(
-                controller: typeController,
-                decoration: const InputDecoration(labelText: 'Plant Type'),
-              ),
-              TextField(
-                controller: frequencyController,
-                decoration: const InputDecoration(
-                  labelText: 'Watering Frequency',
-                ),
-              ),
-            ],
-          ),
-          actions: [
+      builder: (_) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: const Text('Edit Plant'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Plant Name')),
+            TextField(controller: typeController, decoration: const InputDecoration(labelText: 'Plant Type')),
+            TextField(controller: frequencyController, decoration: const InputDecoration(labelText: 'Watering Frequency')),
+          ],
+        ),
+        actions: [
             TextButton(
-              child: const Text('Cancel'),
               onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
               ),
-              child: const Text('Save'),
               onPressed: () async {
                 final updatedPlant = PlantModel(
                   id: plant.id,
@@ -122,30 +100,26 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                   userId: plant.userId,
                   lastWateredDate: plant.lastWateredDate,
                 );
-
                 await DbHelper.updatePlant(updatedPlant);
                 Navigator.pop(context);
                 loadData();
               },
+              child: const Text('Save'),
             ),
-          ],
-        );
-      },
+        ],
+      ),
     );
   }
 
   Future<void> deletePlantWithConfirm(PlantModel plant) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (_) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
         title: const Text('Delete Plant'),
         content: Text('Are you sure you want to delete "${plant.name}"?'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () => Navigator.pop(context, true),
@@ -158,7 +132,6 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
     if (confirm == true) {
       await DbHelper.deletePlant(plant.id!);
       loadData();
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Plant "${plant.name}" deleted successfully.'),
@@ -173,20 +146,18 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-
     final cardColor = isDark ? Colors.grey[850] : Colors.white;
     final textColor = isDark ? Colors.grey[200] : const Color(0xff748873);
     final subTextColor = isDark ? Colors.grey[400] : const Color(0xff748873);
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(8.0),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 30),
+              const SizedBox(height: 10),
               dataUser == null
                   ? const CircularProgressIndicator()
                   : Text(
@@ -194,17 +165,13 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                       style: TextStyle(fontSize: 20, color: textColor),
                     ),
               const SizedBox(height: 10),
-              Text(
-                'How are your plants today?',
-                style: TextStyle(fontSize: 18, color: subTextColor),
-              ),
+              Text('How are your plants today?', style: TextStyle(fontSize: 18, color: subTextColor)),
               const SizedBox(height: 25),
-              Text(
-                'Your Plants',
-                style: TextStyle(fontSize: 16, color: subTextColor),
-              ),
-              const SizedBox(height: 20),
-              Center(
+              Text('Your friend(s)', style: TextStyle(fontSize: 16, color: subTextColor)),
+              const SizedBox(height: 10),
+
+              // Hanya list tanaman yang bisa discroll
+              Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   width: double.infinity,
@@ -228,68 +195,37 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                           ),
                         )
                       : ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: userPlants?.length,
-                          itemBuilder: (BuildContext context, int index) {
+                          itemCount: userPlants!.length,
+                          itemBuilder: (context, index) {
                             final data = userPlants![index];
                             final progress = calculateProgress(data);
                             final progressPercent = (progress * 100).toInt();
                             final canWater = progress >= 1.0;
 
                             return ListTile(
-                              title: Text(
-                                data.name,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: textColor,
-                                ),
-                              ),
+                              title: Text(data.name, style: TextStyle(fontSize: 18, color: textColor)),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    data.plant,
-                                    style: TextStyle(color: subTextColor),
-                                  ),
-                                  Text(
-                                    'Watering frequency: ${data.frequency}',
-                                    style: TextStyle(color: subTextColor),
-                                  ),
+                                  Text(data.plant, style: TextStyle(color: subTextColor)),
+                                  Text('Watering frequency: ${data.frequency}', style: TextStyle(color: subTextColor)),
                                   const SizedBox(height: 4),
                                   LinearProgressIndicator(
                                     value: progress,
                                     borderRadius: BorderRadius.circular(11),
-                                    backgroundColor: isDark
-                                        ? Colors.grey[700]
-                                        : const Color(0x80A6AD88),
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      const Color(0xffA6AD88),
-                                    ),
+                                    backgroundColor: isDark ? Colors.grey[700] : const Color(0x80A6AD88),
+                                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xffA6AD88)),
                                   ),
-                                  Text(
-                                    'Progress: $progressPercent%',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: subTextColor,
-                                    ),
-                                  ),
+                                  Text('Progress: $progressPercent%', style: TextStyle(fontSize: 12, color: subTextColor)),
                                 ],
                               ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    icon: const Icon(
-                                      Icons.water_drop,
-                                      size: 18,
-                                    ),
-                                    color: canWater
-                                        ? const Color(0xffA6D8A8)
-                                        : Colors.grey.shade500,
-                                    onPressed: canWater
-                                        ? () => waterPlant(data)
-                                        : null,
+                                    icon: const Icon(Icons.water_drop, size: 18),
+                                    color: canWater ? const Color(0xffA6D8A8) : Colors.grey.shade500,
+                                    onPressed: canWater ? () => waterPlant(data) : null,
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.edit, size: 18),
@@ -298,9 +234,8 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.delete, size: 18),
-                                    color: Color(0xffB7B89F),
-                                    onPressed: () =>
-                                        deletePlantWithConfirm(data),
+                                    color: const Color(0xffB7B89F),
+                                    onPressed: () => deletePlantWithConfirm(data),
                                   ),
                                 ],
                               ),

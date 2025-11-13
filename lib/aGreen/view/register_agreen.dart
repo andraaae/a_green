@@ -194,7 +194,7 @@ class _RegisterAgreenState extends State<RegisterAgreen> {
                           address: "",
                         );
                         DbHelper.registerUser(data);
-                        Fluttertoast.showToast(msg: "Register Berhasil");
+                        Fluttertoast.showToast(msg: "Register success");
                         //pindah ke halamamn home
                         Navigator.pushReplacement(
                           context,
