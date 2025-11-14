@@ -57,16 +57,20 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
   }
 
   void _showEditProfileDialog() {
-    final TextEditingController nameController =
-        TextEditingController(text: dataUser?.username ?? "");
-    final TextEditingController emailController =
-        TextEditingController(text: dataUser?.email ?? "");
+    final TextEditingController nameController = TextEditingController(
+      text: dataUser?.username ?? "",
+    );
+    final TextEditingController emailController = TextEditingController(
+      text: dataUser?.email ?? "",
+    );
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           title: const Text("Edit Profile"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -132,9 +136,9 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xffA0C878),
-                  foregroundColor: Colors.black,
-                  textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                backgroundColor: const Color(0xffA0C878),
+                foregroundColor: Colors.black,
+                textStyle: const TextStyle(fontWeight: FontWeight.w600),
               ),
               child: const Text("Save"),
             ),
@@ -154,9 +158,9 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
     String initials = getInitials(username);
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -177,15 +181,13 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                   Icon(
                     Icons.person,
                     size: 30,
-                    color: isDark
-                        ? Colors.green[200]
-                        : const Color(0xff658C58),
+                    color: isDark ? Colors.green[200] : const Color(0xff658C58),
                   ),
                 ],
               ),
               const SizedBox(height: 30),
 
-              //Profile Card
+              // Profile Card
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -198,8 +200,9 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundColor:
-                          isDark ? Colors.green[200] : const Color(0xffB9D4AA),
+                      backgroundColor: isDark
+                          ? Colors.green[200]
+                          : const Color(0xffB9D4AA),
                       child: initials.isNotEmpty
                           ? Text(
                               initials,
@@ -272,19 +275,15 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
               ),
               const SizedBox(height: 16),
 
-              //Theme toggle
+              // Theme toggle
               _buildSettingCard(
                 isDark: isDark,
-                icon: themeProvider.isDarkMode
-                    ? Icons.dark_mode
-                    : Icons.sunny,
+                icon: themeProvider.isDarkMode ? Icons.dark_mode : Icons.sunny,
                 iconColor: themeProvider.isDarkMode
                     ? const Color(0xffB7B89F)
                     : const Color(0xffABE7B2),
                 title: 'Theme',
-                subtitle: themeProvider.isDarkMode
-                    ? 'Dark Mode'
-                    : 'Light Mode',
+                subtitle: themeProvider.isDarkMode ? 'Dark Mode' : 'Light Mode',
                 trailing: Switch(
                   value: themeProvider.isDarkMode,
                   onChanged: (value) => themeProvider.toggleTheme(value),
@@ -295,7 +294,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
 
               const SizedBox(height: 16),
 
-              //Notification toggle
+              // Notification toggle
               _buildSettingCard(
                 isDark: isDark,
                 icon: isSounding
@@ -305,8 +304,9 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                     ? const Color(0xffABE7B2)
                     : const Color(0xffB7B89F),
                 title: 'Notification',
-                subtitle:
-                    isSounding ? "Notification's on" : "Notification's off",
+                subtitle: isSounding
+                    ? "Notification's on"
+                    : "Notification's off",
                 trailing: Switch(
                   value: isSounding,
                   onChanged: (value) => updateNotificationStatus(value),
@@ -322,13 +322,12 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                 height: 30,
               ),
 
-              //About
               const SizedBox(height: 20),
               _buildAboutCard(isDark, context),
 
               const SizedBox(height: 40),
 
-              //Logout
+              // Logout
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -342,7 +341,8 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const SplashScreen()),
+                        builder: (context) => const SplashScreen(),
+                      ),
                     );
                   },
                   child: const Text(
@@ -358,7 +358,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
     );
   }
 
-  //Reusable Setting Card
+  // Reusable Setting Card
   Widget _buildSettingCard({
     required bool isDark,
     required IconData icon,
@@ -407,7 +407,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
     );
   }
 
-  //About section card
+  // About section card
   Widget _buildAboutCard(bool isDark, BuildContext context) {
     return Container(
       decoration: BoxDecoration(
@@ -415,7 +415,10 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
-        leading: Icon(Icons.info, color: isDark ? Colors.green[200] : const Color(0xffCBF3BB)),
+        leading: Icon(
+          Icons.info,
+          color: isDark ? Colors.green[200] : const Color(0xffCBF3BB),
+        ),
         title: Text(
           'About aGreen',
           style: TextStyle(
@@ -426,9 +429,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
         ),
         subtitle: Text(
           'Version 2.0.0',
-          style: TextStyle(
-            color: isDark ? Colors.grey[400] : Colors.grey,
-          ),
+          style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey),
         ),
         onTap: () {
           Navigator.push(

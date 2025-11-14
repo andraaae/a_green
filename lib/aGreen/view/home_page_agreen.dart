@@ -2,6 +2,8 @@ import 'package:a_green/aGreen/database/db_helper.dart';
 import 'package:a_green/aGreen/database/preferrence.dart';
 import 'package:a_green/aGreen/models/plant_model.dart';
 import 'package:a_green/aGreen/models/user_model.dart';
+import 'package:a_green/aGreen/view/plant_tips.dart';
+import 'package:a_green/aGreen/view/plant_tips_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -66,7 +68,7 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
   void showUpdateDialog(PlantModel plant) {
     final nameController = TextEditingController(text: plant.name);
     final typeController = TextEditingController(text: plant.plant);
-    final frequencyController = TextEditingController(text: plant.frequency);
+    final freqController = TextEditingController(text: plant.frequency);
 
     showDialog(
       context: context,
@@ -78,34 +80,34 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
           children: [
             TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Plant Name')),
             TextField(controller: typeController, decoration: const InputDecoration(labelText: 'Plant Type')),
-            TextField(controller: frequencyController, decoration: const InputDecoration(labelText: 'Watering Frequency')),
+            TextField(controller: freqController, decoration: const InputDecoration(labelText: 'Watering Frequency')),
           ],
         ),
         actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-              ),
-              onPressed: () async {
-                final updatedPlant = PlantModel(
-                  id: plant.id,
-                  name: nameController.text,
-                  plant: typeController.text,
-                  frequency: frequencyController.text,
-                  status: plant.status,
-                  userId: plant.userId,
-                  lastWateredDate: plant.lastWateredDate,
-                );
-                await DbHelper.updatePlant(updatedPlant);
-                Navigator.pop(context);
-                loadData();
-              },
-              child: const Text('Save'),
-            ),
+            onPressed: () async {
+              final updatedPlant = PlantModel(
+                id: plant.id,
+                name: nameController.text,
+                plant: typeController.text,
+                frequency: freqController.text,
+                status: plant.status,
+                userId: plant.userId,
+                lastWateredDate: plant.lastWateredDate,
+              );
+              await DbHelper.updatePlant(updatedPlant);
+              Navigator.pop(context);
+              loadData();
+            },
+            child: const Text('Save'),
+          ),
         ],
       ),
     );
@@ -167,10 +169,63 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
               const SizedBox(height: 10),
               Text('How are your plants today?', style: TextStyle(fontSize: 18, color: subTextColor)),
               const SizedBox(height: 25),
+
+              //PLANT TIPS CARD
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PlantTipsPage()),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDFF4D8),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.4),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.lightbulb, color: Colors.orange),
+                      ),
+                      const SizedBox(width: 15),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            "Plant Tips 🌱",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            "Pelajari cara merawat tanamanmu",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 25),
+
               Text('Your friend(s)', style: TextStyle(fontSize: 16, color: subTextColor)),
               const SizedBox(height: 10),
 
-              // Hanya list tanaman yang bisa discroll
+              // List tanaman
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(8),
