@@ -3,7 +3,6 @@ import 'package:a_green/aGreen/database/preferrence.dart';
 import 'package:a_green/aGreen/models/plant_model.dart';
 import 'package:a_green/aGreen/models/user_model.dart';
 import 'package:a_green/aGreen/view/plant_tips.dart';
-import 'package:a_green/aGreen/view/plant_tips_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -84,10 +83,7 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
@@ -175,42 +171,54 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const PlantTipsPage()),
+                    MaterialPageRoute(builder: (_) => const PlantTips()),
                   );
                 },
                 child: Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFDFF4D8),
+                    color: theme.colorScheme.secondaryContainer,
                     borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      if (!isDark)
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                    ],
                   ),
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.4),
+                          color: theme.colorScheme.primary.withOpacity(0.15),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.lightbulb, color: Colors.orange),
+                        child: Icon(
+                          Icons.lightbulb,
+                          color: theme.colorScheme.primary,
+                        ),
                       ),
                       const SizedBox(width: 15),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
                             "Plant Tips 🌱",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.onSecondaryContainer,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
                             "Pelajari cara merawat tanamanmu",
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.black54,
+                              color: theme.colorScheme.onSecondaryContainer.withOpacity(0.7),
                             ),
                           ),
                         ],
@@ -225,7 +233,6 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
               Text('Your friend(s)', style: TextStyle(fontSize: 16, color: subTextColor)),
               const SizedBox(height: 10),
 
-              // List tanaman
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(8),

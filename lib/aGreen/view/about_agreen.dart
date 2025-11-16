@@ -14,9 +14,9 @@ class _AboutAgreenState extends State<AboutAgreen> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
-
-    final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFCBF3BB);
-    final cardColor = isDark ? const Color(0xFF2B2B2B) : Colors.white;
+    final lightMint = const Color(0xFFCBF3BB);
+    final bgColor = isDark ? const Color(0xFF1E1E1E) : lightMint;
+    final cardColor = isDark ? const Color(0xFF2B2B2B) : lightMint;
     final textColor = isDark ? Colors.white : Colors.black87;
     final subTextColor = isDark ? Colors.grey[400] : Colors.grey[700];
     final accentColor = isDark ? const Color(0xffA0C878) : const Color(0xff94BF9E);
