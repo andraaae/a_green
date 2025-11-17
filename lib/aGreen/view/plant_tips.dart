@@ -15,8 +15,8 @@ class PlantTips extends StatelessWidget {
     final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFCBF3BB);
     final appBarColor = isDark ? const Color(0xFF2B2B2B) : const Color(0xFFCBF3BB);
     final cardColor = isDark ? const Color(0xFF2A2A2A) : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black87;
-    final subTextColor = isDark ? Colors.white70 : Colors.black54;
+    final textColor = isDark ? Color(0xFFDDEEDB) : Colors.black87;
+    final subTextColor = isDark ? Color(0xFFDDEEDB) : Colors.black54;
 
     final Map<String, String> details = {
       "Pencahayaan": """
@@ -110,35 +110,38 @@ Kunci utama adalah menyiram sesuai kebutuhan, bukan jadwal tetap.
         ),
       ),
 
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          ...details.entries.map(
-            (item) => Column(
-              children: [
-                TipItem(
-                  title: item.key,
-                  desc: _shortDesc(item.key),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => PlantTipDetail(
-                          title: item.key,
-                          detail: item.value,
+      body: Container(
+        color: bgColor,
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            ...details.entries.map(
+              (item) => Column(
+                children: [
+                  TipItem(
+                    title: item.key,
+                    desc: _shortDesc(item.key),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PlantTipDetail(
+                            title: item.key,
+                            detail: item.value,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  cardColor: cardColor,
-                  titleColor: textColor,
-                  descColor: subTextColor,
-                ),
-                const SizedBox(height: 15),
-              ],
+                      );
+                    },
+                    cardColor: cardColor,
+                    titleColor: textColor,
+                    descColor: subTextColor,
+                  ),
+                  const SizedBox(height: 15),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -217,7 +220,7 @@ class TipItem extends StatelessWidget {
             Text(
               desc,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 14,
                 color: descColor,
               ),
             )
