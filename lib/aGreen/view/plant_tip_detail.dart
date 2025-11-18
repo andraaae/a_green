@@ -15,9 +15,11 @@ class PlantTipDetail extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
-      ),
-      backgroundColor: colors.background,
+        backgroundColor: Color(0xffCBF3BB),
+        title:
+         Text(title),
+      ), 
+      backgroundColor: Colors.white,
 
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -25,7 +27,7 @@ class PlantTipDetail extends StatelessWidget {
           child: Text(
             detail,
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 18,
               height: 1.45,
               color: colors.onBackground,
             ),
