@@ -168,10 +168,10 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
     String initials = getInitials(username);
 
     return Scaffold(
-      resizeToAvoidBottomInset: true, // ⭐ FIX 1
+      resizeToAvoidBottomInset: true, 
 
       body: SafeArea(
-        child: LayoutBuilder( // ⭐ FIX 2
+        child: LayoutBuilder( 
           builder: (context, constraints) {
             return SingleChildScrollView(
               child: ConstrainedBox(
