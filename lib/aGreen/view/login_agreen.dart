@@ -67,7 +67,7 @@ class _LoginAgreenState extends State<LoginAgreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffCBF3BB),
-      resizeToAvoidBottomInset: false, // <- mencegah layout geser saat keyboard muncul
+      resizeToAvoidBottomInset: false,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -191,7 +191,7 @@ class _LoginAgreenState extends State<LoginAgreen> {
                   onChanged: (_) => checkFormField(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Password cannot be empty';
+                      return 'Password can not be empty';
                     } else if (value.length < 7) {
                       return 'Minimum password length is 7 characters';
                     }

@@ -156,6 +156,7 @@ class _RegisterAgreenState extends State<RegisterAgreen> {
                           isVisible = !isVisible;
                           obscurePass = !obscurePass;
                         });
+                        
                       },
                       icon: Icon(
                         isVisible ? Icons.visibility : Icons.visibility_off,
@@ -211,6 +212,7 @@ class _RegisterAgreenState extends State<RegisterAgreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    
                   ),
                 ),
 

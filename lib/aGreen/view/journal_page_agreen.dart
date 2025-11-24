@@ -17,7 +17,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
   UserModel? dataUser;
   List<PlantModel>? userPlants = [];
   List<PlantModel>? filteredPlants = [];
-  Map<int, JournalModel?> lastJournalMap = {}; // simpan catatan terakhir tiap tanaman
+  Map<int, JournalModel?> lastJournalMap = {};
 
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = "";
@@ -182,7 +182,6 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
 
               const SizedBox(height: 16),
 
-              // Container berisi list scrollable
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(8),
@@ -345,7 +344,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                     final note = controller.text.trim();
                     if (note.isEmpty) return;
 
-                    FocusScope.of(context).unfocus(); // tutup keyboard
+                    FocusScope.of(context).unfocus();
 
                     final date =
                         DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -364,7 +363,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                       lastJournalMap[data.id ?? 0] = journal;
                     });
 
-                    controller.clear(); // clear sebelum pop
+                    controller.clear();
                     Navigator.pop(context);
 
                     _showSaveDialog(context, data.name);

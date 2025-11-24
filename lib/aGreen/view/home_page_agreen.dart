@@ -77,13 +77,27 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Plant Name')),
-            TextField(controller: typeController, decoration: const InputDecoration(labelText: 'Plant Type')),
-            TextField(controller: freqController, decoration: const InputDecoration(labelText: 'Watering Frequency')),
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Plant Name'),
+            ),
+            TextField(
+              controller: typeController,
+              decoration: const InputDecoration(labelText: 'Plant Type'),
+            ),
+            TextField(
+              controller: freqController,
+              decoration: const InputDecoration(
+                labelText: 'Watering Frequency',
+              ),
+            ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
@@ -117,7 +131,10 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
         title: const Text('Delete Plant'),
         content: Text('Are you sure you want to delete "${plant.name}"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () => Navigator.pop(context, true),
@@ -163,7 +180,10 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                       style: TextStyle(fontSize: 20, color: textColor),
                     ),
               const SizedBox(height: 10),
-              Text('How are your plants today?', style: TextStyle(fontSize: 18, color: subTextColor)),
+              Text(
+                'How are your plants today?',
+                style: TextStyle(fontSize: 18, color: subTextColor),
+              ),
               const SizedBox(height: 25),
 
               //PLANT TIPS CARD
@@ -215,10 +235,11 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Pelajari cara merawat tanamanmu",
+                            "Learn how to care for your plants",
                             style: TextStyle(
                               fontSize: 13,
-                              color: theme.colorScheme.onSecondaryContainer.withOpacity(0.7),
+                              color: theme.colorScheme.onSecondaryContainer
+                                  .withOpacity(0.7),
                             ),
                           ),
                         ],
@@ -230,7 +251,10 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
 
               const SizedBox(height: 25),
 
-              Text('Your friend(s)', style: TextStyle(fontSize: 16, color: subTextColor)),
+              Text(
+                'Your friend(s)',
+                style: TextStyle(fontSize: 16, color: subTextColor),
+              ),
               const SizedBox(height: 10),
 
               Expanded(
@@ -265,29 +289,59 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                             final canWater = progress >= 1.0;
 
                             return ListTile(
-                              title: Text(data.name, style: TextStyle(fontSize: 18, color: textColor)),
+                              title: Text(
+                                data.name,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: textColor,
+                                ),
+                              ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(data.plant, style: TextStyle(color: subTextColor)),
-                                  Text('Watering frequency: ${data.frequency}', style: TextStyle(color: subTextColor)),
+                                  Text(
+                                    data.plant,
+                                    style: TextStyle(color: subTextColor),
+                                  ),
+                                  Text(
+                                    'Watering frequency: ${data.frequency}',
+                                    style: TextStyle(color: subTextColor),
+                                  ),
                                   const SizedBox(height: 4),
                                   LinearProgressIndicator(
                                     value: progress,
                                     borderRadius: BorderRadius.circular(11),
-                                    backgroundColor: isDark ? Colors.grey[700] : const Color(0x80A6AD88),
-                                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xffA6AD88)),
+                                    backgroundColor: isDark
+                                        ? Colors.grey[700]
+                                        : const Color(0x80A6AD88),
+                                    valueColor:
+                                        const AlwaysStoppedAnimation<Color>(
+                                          Color(0xffA6AD88),
+                                        ),
                                   ),
-                                  Text('Progress: $progressPercent%', style: TextStyle(fontSize: 12, color: subTextColor)),
+                                  Text(
+                                    'Progress: $progressPercent%',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: subTextColor,
+                                    ),
+                                  ),
                                 ],
                               ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    icon: const Icon(Icons.water_drop, size: 18),
-                                    color: canWater ? const Color(0xffA6D8A8) : Colors.grey.shade500,
-                                    onPressed: canWater ? () => waterPlant(data) : null,
+                                    icon: const Icon(
+                                      Icons.water_drop,
+                                      size: 18,
+                                    ),
+                                    color: canWater
+                                        ? const Color(0xffA6D8A8)
+                                        : Colors.grey.shade500,
+                                    onPressed: canWater
+                                        ? () => waterPlant(data)
+                                        : null,
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.edit, size: 18),
@@ -297,7 +351,8 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
                                   IconButton(
                                     icon: const Icon(Icons.delete, size: 18),
                                     color: const Color(0xffB7B89F),
-                                    onPressed: () => deletePlantWithConfirm(data),
+                                    onPressed: () =>
+                                        deletePlantWithConfirm(data),
                                   ),
                                 ],
                               ),

@@ -169,7 +169,6 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true, 
-
       body: SafeArea(
         child: LayoutBuilder( 
           builder: (context, constraints) {

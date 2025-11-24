@@ -13,7 +13,9 @@ class PlantTips extends StatelessWidget {
 
     // WARNA SESUAI MODE
     final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFCBF3BB);
-    final appBarColor = isDark ? const Color(0xFF2B2B2B) : const Color(0xFFCBF3BB);
+    final appBarColor = isDark
+        ? const Color(0xFF2B2B2B)
+        : const Color(0xFFCBF3BB);
     final cardColor = isDark ? const Color(0xFF2A2A2A) : Colors.white;
     final textColor = isDark ? Color(0xFFDDEEDB) : Colors.black87;
     final subTextColor = isDark ? Color(0xFFDDEEDB) : Colors.black54;
@@ -104,10 +106,7 @@ Kunci utama adalah menyiram sesuai kebutuhan, bukan jadwal tetap.
         backgroundColor: appBarColor,
         elevation: 0,
         iconTheme: IconThemeData(color: textColor),
-        title: Text(
-          "Plant Tips",
-          style: TextStyle(color: textColor),
-        ),
+        title: Text("Plant Tips", style: TextStyle(color: textColor)),
       ),
 
       body: Container(
@@ -197,9 +196,7 @@ class TipItem extends StatelessWidget {
         shadowColor: Colors.black26,
         elevation: 3,
         padding: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
 
       child: Container(
@@ -217,13 +214,7 @@ class TipItem extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text(
-              desc,
-              style: TextStyle(
-                fontSize: 14,
-                color: descColor,
-              ),
-            )
+            Text(desc, style: TextStyle(fontSize: 14, color: descColor)),
           ],
         ),
       ),

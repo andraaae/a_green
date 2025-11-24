@@ -1,26 +1,35 @@
 import 'package:flutter/material.dart';
+
 class PlantTipDetail extends StatelessWidget {
   final String title;
   final String detail;
 
-  const PlantTipDetail({
-    super.key,
-    required this.title,
-    required this.detail,
-  });
+  const PlantTipDetail({super.key, required this.title, required this.detail});
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Color(0xffCBF3BB),
-        title:
-         Text(title),
-      ), 
-      backgroundColor: Colors.white,
-
+        backgroundColor:
+            theme.appBarTheme.backgroundColor ?? theme.primaryColor,
+        iconTheme:
+            theme.appBarTheme.iconTheme ??
+            IconThemeData(color: colors.onPrimary),
+        title: Text(
+          title,
+          style:
+              theme.appBarTheme.titleTextStyle ??
+              TextStyle(
+                color: colors.onPrimary,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: SingleChildScrollView(
