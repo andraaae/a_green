@@ -1,4 +1,3 @@
-import 'package:a_green/aGreen/view/plant_tips.dart';
 import 'package:a_green/aGreen/view/splash_screen.dart';
 import 'package:a_green/theme/theme_provider.dart';
 import 'package:flutter/material.dart';

@@ -38,7 +38,7 @@ class PlantTipDetail extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               height: 1.45,
-              color: colors.onBackground,
+              color: colors.onSurface,
             ),
           ),
         ),
