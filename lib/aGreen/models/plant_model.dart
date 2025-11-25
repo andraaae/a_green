@@ -8,7 +8,7 @@ class PlantModel {
   final String plant;
   final String status;
   final String frequency;
-  final String? lastWateredDate; // 🔹 kolom baru
+  final String? lastWateredDate;
 
   PlantModel({
     this.id,
@@ -17,7 +17,7 @@ class PlantModel {
     required this.plant,
     required this.status,
     required this.frequency,
-    this.lastWateredDate, // 🔹 tambahin di constructor
+    this.lastWateredDate, 
   });
 
   Map<String, dynamic> toMap() {
@@ -28,7 +28,7 @@ class PlantModel {
       'plant': plant,
       'status': status,
       'frequency': frequency,
-      'lastWateredDate': lastWateredDate, // 🔹 simpan juga ke map
+      'lastWateredDate': lastWateredDate, 
     };
   }
 
@@ -42,7 +42,7 @@ class PlantModel {
       frequency: map['frequency'] as String,
       lastWateredDate: map['lastWateredDate'] != null
           ? map['lastWateredDate'] as String
-          : null, // 🔹 ambil dari db kalau ada
+          : null,
     );
   }
 

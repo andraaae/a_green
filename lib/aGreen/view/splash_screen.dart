@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:a_green/aGreen/bottom_navigation/buttom_navigation_agreen.dart';
 import 'package:a_green/aGreen/database/preferrence.dart';
 import 'package:a_green/aGreen/view/login_agreen.dart';
+import 'package:a_green/aGreen/view/login_firebase.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -55,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen> {
       } else {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const LoginAgreen()),
+          MaterialPageRoute(builder: (context) => const LoginFirebase()),
           (route) => false,
         );
       }

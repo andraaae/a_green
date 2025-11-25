@@ -7,7 +7,7 @@ class PreferenceHandler {
   static const String plantList = "plantList";
   static const String notifStatus =
       "notificationStatus"; // 🆕 key untuk notifikasi
-
+  static const String tokenKey = "authToken";
   //LOGIN HANDLER
   static saveLogin(bool value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -38,6 +38,21 @@ class PreferenceHandler {
   static removeId() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(isId);
+  }
+
+   static Future<void> saveToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(tokenKey, token);
+  }
+
+  static Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(tokenKey);
+  }
+
+  static Future<void> removeToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(tokenKey);
   }
 
   //TANAMAN HANDLER

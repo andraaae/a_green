@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 class UserFirebaseModel {
   String? uid;
   String? username;
@@ -8,6 +7,7 @@ class UserFirebaseModel {
   String? phone;
   String? createdAt;
   String? updateAt;
+
   UserFirebaseModel({
     this.uid,
     this.username,
@@ -18,7 +18,7 @@ class UserFirebaseModel {
   });
 
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{
+    return {
       'uid': uid,
       'username': username,
       'email': email,
@@ -33,7 +33,7 @@ class UserFirebaseModel {
       uid: map['uid'] != null ? map['uid'] as String : null,
       username: map['username'] != null ? map['username'] as String : null,
       email: map['email'] != null ? map['email'] as String : null,
-      // phone: map['phone']! = null ? map['phone'] as String : null,
+      phone: map['phone'] != null ? map['phone'] as String : null,
       createdAt: map['createdAt'] != null ? map['createdAt'] as String : null,
       updateAt: map['updateAt'] != null ? map['updateAt'] as String : null,
     );
@@ -42,5 +42,5 @@ class UserFirebaseModel {
   String toJson() => json.encode(toMap());
 
   factory UserFirebaseModel.fromJson(String source) =>
-      UserFirebaseModel.fromMap(json.decode(source) as Map<String, dynamic>);
+      UserFirebaseModel.fromMap(json.decode(source));
 }

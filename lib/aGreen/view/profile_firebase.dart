@@ -1,6 +1,6 @@
-import 'package:a_green/aGreen/database/db_helper.dart';
 import 'package:a_green/aGreen/database/preferrence.dart';
-import 'package:a_green/aGreen/models/user_model.dart';
+import 'package:a_green/aGreen/models/user_firebase.dart';
+import 'package:a_green/aGreen/service/firebase.dart';
 import 'package:a_green/aGreen/view/about_agreen.dart';
 import 'package:a_green/aGreen/view/splash_screen.dart';
 import 'package:a_green/theme/theme_provider.dart';
@@ -8,15 +8,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class ProfileAgreen extends StatefulWidget {
-  const ProfileAgreen({super.key});
+class ProfileFirebase extends StatefulWidget {
+  const ProfileFirebase({super.key});
 
   @override
-  State<ProfileAgreen> createState() => _ProfileAgreenState();
+  State<ProfileFirebase> createState() => _ProfileFirebaseState();
 }
 
-class _ProfileAgreenState extends State<ProfileAgreen> {
-  UserModel? dataUser;
+class _ProfileFirebaseState extends State<ProfileFirebase> {
+  UserFirebaseModel? dataUser;
   bool isSounding = false;
 
   @override
@@ -26,14 +26,17 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
     loadNotificationStatus();
   }
 
+  // 🔥 Ambil data user dari Firestore
   Future<void> getData() async {
-    var id = await PreferenceHandler.getId();
-    if (id != null) {
-      UserModel? result = await DbHelper.getUser(id);
-      setState(() {
-        dataUser = result;
-      });
-    }
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final result = await FirebaseService.getUserData(user.uid);
+
+    if (!mounted) return;
+    setState(() {
+      dataUser = result;
+    });
   }
 
   Future<void> loadNotificationStatus() async {
@@ -53,55 +56,44 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
   String getInitials(String name) {
     if (name.isEmpty) return "";
     List<String> parts = name.trim().split(' ');
-    String initials = parts.map((part) => part[0].toUpperCase()).take(2).join();
-    return initials;
+    return parts.map((e) => e[0].toUpperCase()).take(2).join();
   }
 
+  // 🔥 Edit Profile (update Firestore)
   void _showEditProfileDialog() {
-    final TextEditingController nameController = TextEditingController(
-      text: dataUser?.username ?? "",
-    );
-    final TextEditingController emailController = TextEditingController(
-      text: dataUser?.email ?? "",
-    );
+    final TextEditingController nameController =
+        TextEditingController(text: dataUser?.username ?? "");
+    final TextEditingController emailController =
+        TextEditingController(text: dataUser?.email ?? "");
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           title: const Text("Edit Profile"),
-
           content: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: "Username",
-                      border: OutlineInputBorder(),
-                    ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    labelText: "Username",
+                    border: OutlineInputBorder(),
                   ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      labelText: "Email",
-                      border: OutlineInputBorder(),
-                    ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                    labelText: "Email",
+                    border: OutlineInputBorder(),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-
           actions: [
             TextButton(
               child: const Text("Cancel"),
@@ -109,41 +101,38 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                if (dataUser != null) {
-                  UserModel updatedUser = UserModel(
-                    id: dataUser!.id,
-                    username: nameController.text,
-                    email: emailController.text,
-                    password: dataUser!.password,
-                    phone: dataUser!.phone,
-                    address: dataUser!.address,
-                  );
+                final user = FirebaseAuth.instance.currentUser;
+                if (user == null) return;
 
-                  await DbHelper.updateUser(updatedUser);
-                  Navigator.pop(context);
-                  await getData();
+                await FirebaseService.updateUserData(
+                  user.uid,
+                  {
+                    "username": nameController.text.trim(),
+                    "email": emailController.text.trim(),
+                    "updateAt": DateTime.now().toIso8601String(),
+                  },
+                );
 
-                  if (context.mounted) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          title: const Text("Success"),
-                          content: const Text("Your profile has been updated!"),
-                          actions: [
-                            TextButton(
-                              child: const Text("OK"),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
-                }
+                Navigator.pop(context);
+                await getData();
+
+                if (!mounted) return;
+
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    title: const Text("Success"),
+                    content: const Text("Your profile has been updated!"),
+                    actions: [
+                      TextButton(
+                        child: const Text("OK"),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xffA0C878),
@@ -188,24 +177,22 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                             style: TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.bold,
-                              color: isDark
-                                  ? Colors.green[200]
-                                  : const Color(0xff658C58),
+                              color:
+                                  isDark ? Colors.green[200] : const Color(0xff658C58),
                             ),
                           ),
                           const SizedBox(width: 8),
                           Icon(
                             Icons.person,
                             size: 30,
-                            color: isDark
-                                ? Colors.green[200]
-                                : const Color(0xff658C58),
+                            color:
+                                isDark ? Colors.green[200] : const Color(0xff658C58),
                           ),
                         ],
                       ),
                       const SizedBox(height: 30),
 
-                      // Profile Card
+                      // PROFILE CARD
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -214,31 +201,20 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                         ),
                         padding: const EdgeInsets.all(20),
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             CircleAvatar(
                               radius: 50,
                               backgroundColor: isDark
                                   ? Colors.green[200]
                                   : const Color(0xffB9D4AA),
-                              child: initials.isNotEmpty
-                                  ? Text(
-                                      initials,
-                                      style: TextStyle(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold,
-                                        color: isDark
-                                            ? Colors.black
-                                            : Colors.white,
-                                      ),
-                                    )
-                                  : Icon(
-                                      Icons.person_outline,
-                                      color: isDark
-                                          ? Colors.black
-                                          : Colors.white,
-                                      size: 45,
-                                    ),
+                              child: Text(
+                                initials,
+                                style: TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.black : Colors.white,
+                                ),
+                              ),
                             ),
                             const SizedBox(width: 24),
                             Expanded(
@@ -246,43 +222,28 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    username.isNotEmpty ? username : "Guest",
+                                    username.isEmpty ? "Guest" : username,
                                     style: TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
-                                      color: isDark
-                                          ? Colors.white
-                                          : Colors.black,
+                                      color: isDark ? Colors.white : Colors.black,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    email.isNotEmpty
-                                        ? email
-                                        : "No email available",
+                                    email.isEmpty ? "No email available" : email,
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: isDark
-                                          ? Colors.grey[400]
-                                          : Colors.grey,
+                                      color:
+                                          isDark ? Colors.grey[400] : Colors.grey,
                                     ),
                                   ),
                                   const SizedBox(height: 10),
                                   TextButton(
                                     onPressed: _showEditProfileDialog,
-                                    style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      foregroundColor: isDark
-                                          ? Colors.green[200]
-                                          : const Color(0xffA0C878),
-                                    ),
                                     child: const Text(
                                       'Edit Profile',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                      style: TextStyle(fontSize: 14),
                                     ),
                                   ),
                                 ],
@@ -293,6 +254,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                       ),
 
                       const SizedBox(height: 40),
+
                       Text(
                         'Settings',
                         style: TextStyle(
@@ -301,70 +263,60 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                           color: isDark ? Colors.white : Colors.black,
                         ),
                       ),
+
                       const SizedBox(height: 16),
 
+                      // THEME CARD
                       _buildSettingCard(
                         isDark: isDark,
-                        icon: themeProvider.isDarkMode
-                            ? Icons.dark_mode
-                            : Icons.sunny,
-                        iconColor: themeProvider.isDarkMode
-                            ? const Color(0xffB7B89F)
-                            : const Color(0xffABE7B2),
+                        icon: isDark ? Icons.dark_mode : Icons.sunny,
+                        iconColor:
+                            isDark ? const Color(0xffB7B89F) : const Color(0xffABE7B2),
                         title: 'Theme',
-                        subtitle: themeProvider.isDarkMode
-                            ? 'Dark Mode'
-                            : 'Light Mode',
+                        subtitle: isDark ? 'Dark Mode' : 'Light Mode',
                         trailing: Switch(
                           value: themeProvider.isDarkMode,
-                          onChanged: (value) =>
-                              themeProvider.toggleTheme(value),
-                          inactiveThumbColor: const Color(0xffA0C878),
-                          activeTrackColor: const Color(0xffCBF3BB),
+                          onChanged: (value) => themeProvider.toggleTheme(value),
                         ),
                       ),
 
                       const SizedBox(height: 16),
 
+                      // NOTIFICATION CARD
                       _buildSettingCard(
                         isDark: isDark,
                         icon: isSounding
                             ? Icons.notifications_active
                             : Icons.notifications_off,
-                        iconColor: isSounding
-                            ? const Color(0xffABE7B2)
-                            : const Color(0xffB7B89F),
+                        iconColor:
+                            isSounding ? const Color(0xffABE7B2) : const Color(0xffB7B89F),
                         title: 'Notification',
                         subtitle: isSounding
                             ? "Notification's on"
                             : "Notification's off",
                         trailing: Switch(
                           value: isSounding,
-                          onChanged: (value) => updateNotificationStatus(value),
-                          inactiveThumbColor: const Color(0xffA0C878),
-                          activeTrackColor: const Color(0xffCBF3BB),
+                          onChanged: updateNotificationStatus,
                         ),
                       ),
 
                       const SizedBox(height: 20),
                       Divider(
-                        color: isDark
-                            ? Colors.green[900]
-                            : Colors.green.shade200,
-                        thickness: 1,
-                        height: 30,
+                        color:
+                            isDark ? Colors.green[900] : Colors.green.shade200,
                       ),
 
                       const SizedBox(height: 20),
+
                       _buildAboutCard(isDark, context),
 
                       const SizedBox(height: 40),
 
+                      // LOGOUT
                       Center(
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
                             elevation: 0,
                             minimumSize: const Size(500, 30),
                             side: const BorderSide(color: Colors.red),
@@ -372,25 +324,18 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
                           onPressed: () async {
                             await PreferenceHandler.saveLogin(false);
                             await FirebaseAuth.instance.signOut();
-                            if (mounted) {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SplashScreen(),
-                                ),
-                                // (route) => false,
-                              );
-                            }
-                            // Navigator.pushReplacement(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => const SplashScreen(),
-                            //   ),
-                            // );
+
+                            if (!mounted) return;
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SplashScreen(),
+                              ),
+                            );
                           },
                           child: const Text(
                             "Logout",
-                            style: TextStyle(color: Colors.red, fontSize: 13),
+                            style: TextStyle(color: Colors.red),
                           ),
                         ),
                       ),
@@ -414,7 +359,6 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
     required Widget trailing,
   }) {
     return Container(
-      width: double.infinity,
       height: 70,
       decoration: BoxDecoration(
         color: isDark ? Colors.grey[850] : Colors.white,
@@ -430,20 +374,13 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: isDark ? Colors.grey[400] : Colors.grey,
-                    fontSize: 12,
-                  ),
-                ),
+                Text(title,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black)),
+                Text(subtitle,
+                    style: TextStyle(
+                        color: isDark ? Colors.grey[400] : Colors.grey)),
               ],
             ),
           ),
@@ -474,7 +411,8 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
         ),
         subtitle: Text(
           'Version 2.0.0',
-          style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey),
+          style:
+              TextStyle(color: isDark ? Colors.grey[400] : Colors.grey),
         ),
         onTap: () {
           Navigator.push(

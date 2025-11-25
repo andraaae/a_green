@@ -1,9 +1,15 @@
 import 'package:a_green/aGreen/view/splash_screen.dart';
+import 'package:a_green/firebase_options.dart';
 import 'package:a_green/theme/theme_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+// import 'package:intl/date_symbol_data_file.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+   WidgetsFlutterBinding.ensureInitialized();
+  // await initializeDateFormatting('id_ID', null);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => ThemeProvider())],
