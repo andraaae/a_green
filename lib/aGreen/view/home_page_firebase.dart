@@ -1,9 +1,9 @@
-import 'package:a_green/aGreen/database/db_helper.dart';
-import 'package:a_green/aGreen/database/preferrence.dart';
-import 'package:a_green/aGreen/models/plant_model.dart';
+import 'package:a_green/aGreen/database/preference_handler_firebase.dart';
+import 'package:a_green/aGreen/models/plant_model_firebase.dart';
 import 'package:a_green/aGreen/models/user_firebase.dart';
 import 'package:a_green/aGreen/service/firebase.dart';
 import 'package:a_green/aGreen/view/plant_tips.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -16,8 +16,9 @@ class HomePageFirebase extends StatefulWidget {
 }
 
 class _HomePageFirebaseState extends State<HomePageFirebase> {
-  UserFirebaseModel? dataUser; // <-- Firebase user
-  List<PlantModel>? userPlants = []; // still using sqlite
+  UserFirebaseModel? dataUser;
+  String? uid;
+  bool loading = true;
 
   @override
   void initState() {
@@ -25,80 +26,135 @@ class _HomePageFirebaseState extends State<HomePageFirebase> {
     loadData();
   }
 
-  Future<void> loadData() async {
-    // --------- LOAD USER FROM FIREBASE ---------
-    final authUser = FirebaseAuth.instance.currentUser;
-
-    if (authUser != null) {
-      final firebaseUser = await FirebaseService.getUserData(authUser.uid);
-      setState(() {
-        dataUser = firebaseUser;
-      });
-    }
-
-    // --------- LOAD PLANTS FROM SQLITE ---------
-    int? id = await PreferenceHandler.getId();
-    if (id != null) {
-      final plants = await DbHelper.getPlantsByUser(id);
-      setState(() {
-        userPlants = plants;
-      });
-    }
-  }
-
-  double calculateProgress(PlantModel plant) {
-    if (plant.lastWateredDate == null) return 0.0;
-    final lastWatered = DateTime.tryParse(plant.lastWateredDate!);
-    if (lastWatered == null) return 0.0;
-
-    final freqMatch = RegExp(r'\d+').firstMatch(plant.frequency);
-    int freqDays = freqMatch != null ? int.parse(freqMatch.group(0)!) : 3;
-
-    final now = DateTime.now();
-    final diffDays = now.difference(lastWatered).inDays;
-    double progress = diffDays / freqDays;
-    return progress.clamp(0.0, 1.0);
-  }
-
-  Future<void> waterPlant(PlantModel plant) async {
-    final updated = PlantModel(
-      id: plant.id,
-      userId: plant.userId,
-      name: plant.name,
-      plant: plant.plant,
-      status: plant.status,
-      frequency: plant.frequency,
-      lastWateredDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+  void confirmDelete(PlantModelFirebase plant) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            "Delete Plant",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            "Are you sure you want to delete \"${plant.name}\"?",
+            style: const TextStyle(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xffE57373), // soft red
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () async {
+                Navigator.pop(context); // tutup dialog dulu
+                await deletePlant(plant); // lalu hapus
+              },
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
     );
-    await DbHelper.updatePlant(updated);
-    loadData();
   }
 
-  void showUpdateDialog(PlantModel plant) {
-    final nameController = TextEditingController(text: plant.name);
-    final typeController = TextEditingController(text: plant.plant);
-    final freqController = TextEditingController(text: plant.frequency);
+  Future<void> loadData() async {
+    final savedUid = await PreferenceHandlerFirebase.getUid();
+    final authUser = FirebaseAuth.instance.currentUser;
+    final finalUid = savedUid ?? authUser?.uid;
+
+    if (finalUid == null) {
+      setState(() => loading = false);
+      return;
+    }
+
+    setState(() => uid = finalUid);
+
+    try {
+      final userData = await FirebaseService.getUserData(finalUid);
+      setState(() {
+        dataUser = userData;
+        loading = false;
+      });
+    } catch (e) {
+      setState(() => loading = false);
+    }
+  }
+
+  // Progress calculation
+  double calculateProgress(PlantModelFirebase plant) {
+    if (plant.lastWateredDate == null) return 0;
+
+    final last = DateTime.tryParse(plant.lastWateredDate!);
+    if (last == null) return 0;
+
+    final match = RegExp(r'\d+').firstMatch(plant.frequency);
+    int freq = match != null ? int.parse(match.group(0)!) : 3;
+
+    final diff = DateTime.now().difference(last).inDays;
+    return (diff / freq).clamp(0.0, 1.0);
+  }
+
+  // Helper: apakah sudah waktunya disiram?
+  bool isTimeToWaterPlant(PlantModelFirebase plant) {
+    if (plant.lastWateredDate == null) return true;
+
+    final last = DateTime.tryParse(plant.lastWateredDate!);
+    if (last == null) return true;
+
+    final match = RegExp(r'\d+').firstMatch(plant.frequency);
+    int freqDays = match != null ? int.parse(match.group(0)!) : 3;
+
+    return DateTime.now().difference(last).inDays >= freqDays;
+  }
+
+  // Water plant
+  Future<void> waterPlant(PlantModelFirebase plant) async {
+    if (plant.id == null) return;
+    await FirebaseFirestore.instance.collection("plants").doc(plant.id).update({
+      ...plant.ToFirestore(),
+      "lastWateredDate": DateFormat("yyyy-MM-dd").format(DateTime.now()),
+    });
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Plant watered")));
+  }
+
+  // EDIT PLANT
+  void showEditDialog(PlantModelFirebase plant) {
+    final nameCtrl = TextEditingController(text: plant.name);
+    final typeCtrl = TextEditingController(text: plant.plant);
+    final freqCtrl = TextEditingController(text: plant.frequency);
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        title: const Text('Edit Plant'),
+        title: const Text("Edit Plant"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-              controller: nameController,
-              decoration: const InputDecoration(labelText: 'Plant Name'),
+              controller: nameCtrl,
+              decoration: const InputDecoration(labelText: "Plant name"),
             ),
             TextField(
-              controller: typeController,
-              decoration: const InputDecoration(labelText: 'Plant Type'),
+              controller: typeCtrl,
+              decoration: const InputDecoration(labelText: "Plant type"),
             ),
             TextField(
-              controller: freqController,
+              controller: freqCtrl,
               decoration: const InputDecoration(
-                labelText: 'Watering Frequency',
+                labelText: "Watering frequency",
               ),
             ),
           ],
@@ -106,112 +162,93 @@ class _HomePageFirebaseState extends State<HomePageFirebase> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text("Cancel"),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-            ),
             onPressed: () async {
-              final updatedPlant = PlantModel(
-                id: plant.id,
-                name: nameController.text,
-                plant: typeController.text,
-                frequency: freqController.text,
-                status: plant.status,
-                userId: plant.userId,
-                lastWateredDate: plant.lastWateredDate,
-              );
-              await DbHelper.updatePlant(updatedPlant);
+              await FirebaseFirestore.instance
+                  .collection("plants")
+                  .doc(plant.id)
+                  .update({
+                    "name": nameCtrl.text.trim(),
+                    "plant": typeCtrl.text.trim(),
+                    "frequency": freqCtrl.text.trim(),
+                  });
               Navigator.pop(context);
-              loadData();
             },
-            child: const Text('Save'),
+            child: const Text("Save"),
           ),
         ],
       ),
     );
   }
 
-  Future<void> deletePlantWithConfirm(PlantModel plant) async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        title: const Text('Delete Plant'),
-        content: Text('Are you sure you want to delete "${plant.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm == true) {
-      await DbHelper.deletePlant(plant.id!);
-      loadData();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Plant "${plant.name}" deleted successfully.'),
-          backgroundColor: Colors.redAccent,
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
+  // DELETE PLANT
+  Future<void> deletePlant(PlantModelFirebase plant) async {
+    if (plant.id == null) return;
+    await FirebaseFirestore.instance
+        .collection("plants")
+        .doc(plant.id)
+        .delete();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (loading)
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+
+    if (uid == null) {
+      return const Scaffold(
+        body: Center(child: Text("UID missing — please login again")),
+      );
+    }
+
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final cardColor = isDark ? Colors.grey[850] : Colors.white;
-    final textColor = isDark ? Colors.grey[200] : const Color(0xff748873);
-    final subTextColor = isDark ? Colors.grey[400] : const Color(0xff748873);
+
+    final cardOuterColor = isDark ? const Color(0xff2F2F2F) : Colors.white;
+    final cardInnerColor = isDark ? const Color(0xff3A3A3A) : Colors.white;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 10),
-
-              // ------------------ FIREBASE USERNAME --------------------
-              dataUser == null
-                  ? const CircularProgressIndicator()
-                  : Text(
-                      'Hello, ${dataUser?.username ?? ""}!',
-                      style: TextStyle(fontSize: 20, color: textColor),
-                    ),
-
-              const SizedBox(height: 10),
-
               Text(
-                'How are your plants today?',
-                style: TextStyle(fontSize: 18, color: subTextColor),
+                "Hello, ${dataUser?.username}!",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
+                ),
               ),
-              const SizedBox(height: 25),
+              const SizedBox(height: 6),
+              Text(
+                "How are your plants today?",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "Your Plants",
+                style: TextStyle(
+                  fontSize: 15,
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                ),
+              ),
+              const SizedBox(height: 10),
 
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const PlantTips()),
-                  );
-                },
+              Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.secondaryContainer,
-                    borderRadius: BorderRadius.circular(18),
+                    color: cardOuterColor,
+                    borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       if (!isDark)
                         BoxShadow(
@@ -221,157 +258,146 @@ class _HomePageFirebaseState extends State<HomePageFirebase> {
                         ),
                     ],
                   ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withOpacity(0.15),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.lightbulb,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Plant Tips 🌱",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.onSecondaryContainer,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Learn how to care for your plants",
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: theme.colorScheme.onSecondaryContainer
-                                  .withOpacity(0.7),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection("plants")
+                        .where("userUid", isEqualTo: uid)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-              const SizedBox(height: 25),
-
-              Text(
-                'Your friend(s)',
-                style: TextStyle(fontSize: 16, color: subTextColor),
-              ),
-              const SizedBox(height: 10),
-
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      if (!isDark)
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                    ],
-                  ),
-                  child: userPlants == null || userPlants!.isEmpty
-                      ? Center(
+                      if (snapshot.data!.docs.isEmpty) {
+                        return Center(
                           child: Text(
-                            'No plants added yet!',
-                            style: TextStyle(color: subTextColor),
+                            "No plants added yet!",
+                            style: TextStyle(color: Colors.grey),
                           ),
-                        )
-                      : ListView.builder(
-                          itemCount: userPlants!.length,
-                          itemBuilder: (context, index) {
-                            final data = userPlants![index];
-                            final progress = calculateProgress(data);
-                            final progressPercent = (progress * 100).toInt();
-                            final canWater = progress >= 1.0;
+                        );
+                      }
 
-                            return ListTile(
-                              title: Text(
-                                data.name,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: textColor,
+                      final docs = snapshot.data!.docs;
+
+                      return ListView.builder(
+                        itemCount: docs.length,
+                        itemBuilder: (context, index) {
+                          final raw =
+                              docs[index].data() as Map<String, dynamic>;
+                          final plant = PlantModelFirebase.fromMap(
+                            raw,
+                            docs[index].id,
+                          );
+
+                          final progress = calculateProgress(plant);
+                          final needsWater = isTimeToWaterPlant(plant);
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: cardInnerColor,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                if (!isDark)
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // NAME
+                                Text(
+                                  plant.name,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
                                 ),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    data.plant,
-                                    style: TextStyle(color: subTextColor),
+                                const SizedBox(height: 4),
+
+                                // TYPE
+                                Text(
+                                  plant.plant,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: theme.colorScheme.onSurface
+                                        .withOpacity(0.7),
                                   ),
-                                  Text(
-                                    'Watering frequency: ${data.frequency}',
-                                    style: TextStyle(color: subTextColor),
+                                ),
+                                const SizedBox(height: 4),
+
+                                // FREQUENCY
+                                Text(
+                                  "Watering frequency: ${plant.frequency}",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: theme.colorScheme.onSurface
+                                        .withOpacity(0.7),
                                   ),
-                                  const SizedBox(height: 4),
-                                  LinearProgressIndicator(
-                                    value: progress,
-                                    borderRadius: BorderRadius.circular(11),
-                                    backgroundColor: isDark
-                                        ? Colors.grey[700]
-                                        : const Color(0x80A6AD88),
-                                    valueColor:
-                                        const AlwaysStoppedAnimation<Color>(
-                                          Color(0xffA6AD88),
-                                        ),
+                                ),
+                                const SizedBox(height: 10),
+
+                                // PROGRESS BAR
+                                LinearProgressIndicator(
+                                  value: progress,
+                                  minHeight: 6,
+                                  backgroundColor: Colors.grey.shade300,
+                                  color: const Color(0xff8CA08A),
+                                ),
+                                const SizedBox(height: 4),
+
+                                Text(
+                                  "Progress: ${(progress * 100).toInt()}%",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: theme.colorScheme.onSurface
+                                        .withOpacity(0.7),
                                   ),
-                                  Text(
-                                    'Progress: $progressPercent%',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: subTextColor,
+                                ),
+
+                                const SizedBox(height: 8),
+
+                                // ICON BUTTONS (water icon color changes when needs watering,
+                                // delete icon is soft red)
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.water_drop),
+                                      color: needsWater
+                                          ? const Color(0xff80A1BA)
+                                          : const Color(0xff6A8A7A),
+                                      onPressed: () => waterPlant(plant),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.water_drop,
-                                      size: 18,
+                                    IconButton(
+                                      icon: const Icon(Icons.edit),
+                                      color: const Color(0xff6A8A7A),
+                                      onPressed: () => showEditDialog(plant),
                                     ),
-                                    color: canWater
-                                        ? const Color(0xffA6D8A8)
-                                        : Colors.grey.shade500,
-                                    onPressed: canWater
-                                        ? () => waterPlant(data)
-                                        : null,
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.edit, size: 18),
-                                    color: const Color(0xffA6D8A8),
-                                    onPressed: () => showUpdateDialog(data),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete, size: 18),
-                                    color: const Color(0xffB7B89F),
-                                    onPressed: () =>
-                                        deletePlantWithConfirm(data),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete),
+                                      color: const Color(
+                                        0xffE57373,
+                                      ), // soft red
+                                      onPressed: () {
+                                        confirmDelete(plant);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
             ],

@@ -24,7 +24,7 @@ class _ReminderAgreenState extends State<ReminderAgreen> {
   }
 
   Future<void> getReminderData() async {
-    var id = await PreferenceHandler.getId();
+    var id = await PreferenceHandler.getUid();
     if (id != null) {
       List<PlantModel> plantsData = await DbHelper.getPlantsByUser(id);
       setState(() {

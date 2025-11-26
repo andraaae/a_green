@@ -24,7 +24,7 @@ class _HomePageAgreenState extends State<HomePageAgreen> {
   }
 
   Future<void> loadData() async {
-    int? id = await PreferenceHandler.getId();
+    int? id = await PreferenceHandler.getUid();
 
     if (id != null) {
       final user = await DbHelper.getUser(id);

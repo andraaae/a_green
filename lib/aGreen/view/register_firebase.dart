@@ -1,8 +1,7 @@
-import 'package:a_green/aGreen/database/preferrence.dart';
+import 'package:a_green/aGreen/bottom_navigation/buttom_navigation_agreen.dart';
+import 'package:a_green/aGreen/database/preference_handler_firebase.dart';
 import 'package:a_green/aGreen/models/user_firebase.dart';
 import 'package:a_green/aGreen/service/firebase.dart';
-import 'package:a_green/aGreen/view/login_agreen.dart';
-import 'package:a_green/aGreen/view/login_firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -20,9 +19,9 @@ class _RegisterFirebaseState extends State<RegisterFirebase> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+
   bool isVisible = false;
   bool isLoading = false;
-  UserFirebaseModel? user;
 
   @override
   Widget build(BuildContext context) {
@@ -141,9 +140,7 @@ class _RegisterFirebaseState extends State<RegisterFirebase> {
                     filled: true,
                     fillColor: Colors.white,
                     prefixIcon: IconButton(
-                      onPressed: () {
-                        setState(() => isVisible = !isVisible);
-                      },
+                      onPressed: () => setState(() => isVisible = !isVisible),
                       icon: Icon(
                         isVisible ? Icons.visibility : Icons.visibility_off,
                       ),
@@ -183,31 +180,42 @@ class _RegisterFirebaseState extends State<RegisterFirebase> {
                             setState(() => isLoading = true);
 
                             try {
-                              final result = await FirebaseService.registerUser(
-                                email: emailController.text.trim(),
-                                username: nameController.text.trim(),
-                                password: passwordController.text.trim(),
-                                phone: phoneController.text.trim(),
+                              // CALL FIREBASE SERVICE
+                              final UserFirebaseModel? user =
+                                  await FirebaseService.registerUser(
+                                    email: emailController.text.trim(),
+                                    username: nameController.text.trim(),
+                                    password: passwordController.text.trim(),
+                                    phone: phoneController.text.trim(),
+                                  );
+
+                              setState(() => isLoading = false);
+
+                              if (user == null || user.uid == null) {
+                                Fluttertoast.showToast(msg: "Register failed");
+                                return;
+                              }
+
+                              // 🔥 SIMPAN UID
+                              await PreferenceHandlerFirebase.saveUid(
+                                user.uid!,
                               );
 
-                              setState(() {
-                                user = result;
-                                isLoading = false;
-                              });
+                              // 🔥 SIMPAN STATUS LOGIN
+                              await PreferenceHandlerFirebase.saveLogin(true);
 
-                              if (user?.uid != null) {
-                                await PreferenceHandler.saveToken(user!.uid!);
-                                Fluttertoast.showToast(
-                                  msg: "Register successful",
-                                );
+                              Fluttertoast.showToast(
+                                msg: "Register successful!",
+                              );
 
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LoginFirebase(),
-                                  ),
-                                );
-                              }
+                              // ➜ AUTO MASUK KE HOME
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const ButtomNavigationAgreen(),
+                                ),
+                              );
                             } catch (e) {
                               setState(() => isLoading = false);
                               Fluttertoast.showToast(msg: e.toString());
@@ -217,32 +225,6 @@ class _RegisterFirebaseState extends State<RegisterFirebase> {
                       ),
 
                 const SizedBox(height: 18),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Already have an account?"),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginAgreen(),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        "Login here",
-                        style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFFADD899),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),

@@ -1,23 +1,24 @@
-import 'package:a_green/aGreen/database/db_helper.dart';
-import 'package:a_green/aGreen/database/preferrence.dart';
-import 'package:a_green/aGreen/models/plant_model.dart';
-import 'package:a_green/aGreen/models/user_model.dart';
-import 'package:a_green/aGreen/models/journal_model.dart';
+import 'package:a_green/aGreen/database/preference_handler_firebase.dart';
+import 'package:a_green/aGreen/models/plant_model_firebase.dart';
+import 'package:a_green/aGreen/models/user_firebase.dart';
+import 'package:a_green/aGreen/models/journal_model_firebase.dart';
+import 'package:a_green/aGreen/service/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class JournalPageAgreen extends StatefulWidget {
-  const JournalPageAgreen({super.key});
+class JournalFirebase extends StatefulWidget {
+  const JournalFirebase({super.key});
 
   @override
-  State<JournalPageAgreen> createState() => _JournalPageAgreenState();
+  State<JournalFirebase> createState() => _JournalFirebaseState();
 }
 
-class _JournalPageAgreenState extends State<JournalPageAgreen> {
-  UserModel? dataUser;
-  List<PlantModel>? userPlants = [];
-  List<PlantModel>? filteredPlants = [];
-  Map<int, JournalModel?> lastJournalMap = {};
+class _JournalFirebaseState extends State<JournalFirebase> {
+  UserFirebaseModel? dataUser;
+  List<PlantModelFirebase>? userPlants = [];
+  List<PlantModelFirebase>? filteredPlants = [];
+
+  Map<String, JournalModelFirebase?> lastJournalMap = {};
 
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = "";
@@ -28,38 +29,45 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
     getData();
   }
 
+  // =====================================================
+  // 🔥 FIREBASE VERSION OF FETCHING DATA
+  // =====================================================
   Future<void> getData() async {
-    var id = await PreferenceHandler.getUid();
-    if (id != null) {
-      UserModel? result = await DbHelper.getUser(id);
-      List<PlantModel> plantsData = await DbHelper.getPlantsByUser(id);
+    final uid = await PreferenceHandlerFirebase.getUid();
+    if (uid == null) return;
 
-      Map<int, JournalModel?> lastJournalTemp = {};
-      for (var plant in plantsData) {
-        var journals = await DbHelper.getJournalsByDate(
-          id,
-          DateFormat('yyyy-MM-dd').format(DateTime.now()),
-        );
+    // Ambil user dari Firestore
+    final userData = await FirebaseService.getUserData(uid);
 
-        JournalModel? lastJournal;
-        try {
-          lastJournal = journals.firstWhere((j) => j.title == plant.name);
-        } catch (e) {
-          lastJournal = null;
-        }
+    // Ambil plants user dari Firestore
+    final plants = await FirebaseService.getPlantsByUser(uid);
 
-        lastJournalTemp[plant.id ?? 0] = lastJournal;
-      }
+    // Ambil jurnal plant untuk hari ini
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-      setState(() {
-        dataUser = result;
-        userPlants = plantsData;
-        filteredPlants = plantsData;
-        lastJournalMap = lastJournalTemp;
-      });
+    Map<String, JournalModelFirebase?> lastJournalTemp = {};
+
+    for (var plant in plants) {
+      final journal = await FirebaseService.getJournalByPlantAndDate(
+        uid,
+        plant.name,
+        today,
+      );
+
+      lastJournalTemp[plant.id!] = journal;
     }
+
+    setState(() {
+      dataUser = userData;
+      userPlants = plants;
+      filteredPlants = plants;
+      lastJournalMap = lastJournalTemp;
+    });
   }
 
+  // =====================================================
+  // FILTER SEARCH
+  // =====================================================
   void _filterPlants(String query) {
     setState(() {
       _searchQuery = query;
@@ -78,6 +86,9 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
     });
   }
 
+  // =====================================================
+  // UI BELOW (TIDAK DIUBAH)
+  // =====================================================
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -109,7 +120,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
               ),
               const SizedBox(height: 30),
 
-              // Summary Card
+              // Summary
               Center(
                 child: Container(
                   width: 220,
@@ -124,29 +135,27 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                           color: Colors.grey.withOpacity(0.2),
                           blurRadius: 6,
                           offset: const Offset(0, 3),
-                        ),
+                        )
                     ],
                   ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         userPlants?.length.toString() ?? "0",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color:
-                              isDark ? Colors.green[200] : const Color(0xff658C58),
+                          color: isDark ? Colors.green[200] : const Color(0xff658C58),
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Plants total',
+                        "Plants total",
                         style: TextStyle(
                           fontSize: 12,
                           color: isDark ? Colors.grey[400] : Colors.grey[600],
                         ),
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -154,7 +163,7 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
 
               const SizedBox(height: 40),
               Text(
-                'Friend(s)',
+                "Friend(s)",
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -177,11 +186,13 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                     borderSide: BorderSide.none,
                   ),
                 ),
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
               ),
 
               const SizedBox(height: 16),
 
+              // =====================================================
+              // LIST PLANTS
+              // =====================================================
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(8),
@@ -189,43 +200,37 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                     color: isDark ? Colors.grey[850] : Colors.white,
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  child: userPlants == null
+                  child: filteredPlants == null
                       ? const Center(child: CircularProgressIndicator())
                       : filteredPlants!.isEmpty
                           ? Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(24.0),
-                                child: Text(
-                                  _searchQuery.isEmpty
-                                      ? "No plants yet 🌱"
-                                      : "No match found 🌿",
-                                  style: TextStyle(
-                                    color: isDark
-                                        ? Colors.grey[400]
-                                        : Colors.grey[700],
-                                  ),
+                              child: Text(
+                                _searchQuery.isEmpty
+                                    ? "No plants yet 🌱"
+                                    : "No match found 🌿",
+                                style: TextStyle(
+                                  color: isDark
+                                      ? Colors.grey[400]
+                                      : Colors.grey[700],
                                 ),
                               ),
                             )
                           : ListView.builder(
-                              physics: const BouncingScrollPhysics(),
                               itemCount: filteredPlants!.length,
                               itemBuilder: (context, index) {
-                                final data = filteredPlants![index];
-                                final lastJournal = lastJournalMap[data.id ?? 0];
+                                final plant = filteredPlants![index];
+                                final lastJournal = lastJournalMap[plant.id];
 
                                 return Card(
-                                  color:
-                                      isDark ? Colors.grey[900] : Colors.grey[50],
+                                  color: isDark ? Colors.grey[900] : Colors.grey[50],
                                   elevation: 3,
-                                  margin:
-                                      const EdgeInsets.symmetric(vertical: 6),
+                                  margin: const EdgeInsets.symmetric(vertical: 6),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: ListTile(
                                     title: Text(
-                                      data.name,
+                                      plant.name,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: isDark
@@ -234,11 +239,10 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                                       ),
                                     ),
                                     subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          "Type: ${data.plant}\nFrequency: ${data.frequency}",
+                                          "Type: ${plant.plant}\nFrequency: ${plant.frequency}",
                                           style: TextStyle(
                                             color: isDark
                                                 ? Colors.grey[400]
@@ -261,13 +265,13 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
                                       ],
                                     ),
                                     isThreeLine: lastJournal != null,
-                                    onTap: () => _showJournalSheet(context, data),
+                                    onTap: () => _showJournalSheet(context, plant),
                                   ),
                                 );
                               },
                             ),
                 ),
-              ),
+              )
             ],
           ),
         ),
@@ -275,8 +279,11 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
     );
   }
 
-  void _showJournalSheet(BuildContext context, PlantModel data) {
-    final TextEditingController controller = TextEditingController();
+  // =====================================================
+  // BOTTOM SHEET – ADD JOURNAL (FIREBASE VERSION)
+  // =====================================================
+  void _showJournalSheet(BuildContext context, PlantModelFirebase plant) {
+    final controller = TextEditingController();
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -285,117 +292,110 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
       isScrollControlled: true,
       backgroundColor: isDark ? Colors.grey[900] : Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-      ),
-      builder: (context) {
-        return SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.only(
-              left: 20,
-              right: 20,
-              top: 20,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 50,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[400],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+      builder: (_) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 50,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "Journal for ${plant.name}",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.green[200] : const Color(0xff658C58),
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                maxLines: 5,
+                decoration: InputDecoration(
+                  hintText: "Write down ${plant.name}'s progress here...",
+                  hintStyle: TextStyle(
+                      color: isDark ? Colors.grey[500] : Colors.grey[600]),
+                  filled: true,
+                  fillColor: isDark ? Colors.grey[850] : const Color(0xffF7F7F7),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
                   ),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  "Journal for ${data.name}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.green[200] : const Color(0xff658C58),
-                    fontSize: 16,
-                  ),
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              ),
+              const SizedBox(height: 14),
+
+              ElevatedButton(
+                onPressed: () async {
+                  final note = controller.text.trim();
+                  if (note.isEmpty) return;
+
+                  final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+                  final uid = await PreferenceHandlerFirebase.getUid();
+
+                  if (uid == null) return;
+
+                  final journal = JournalModelFirebase(
+                    userUid: uid,
+                    title: plant.name,
+                    content: note,
+                    date: date,
+                  );
+
+                  await FirebaseService.addJournal(journal);
+
+                  setState(() {
+                    lastJournalMap[plant.id!] = journal;
+                  });
+
+                  controller.clear();
+                  Navigator.pop(context);
+
+                  _showSaveDialog(context, plant.name);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      isDark ? Colors.green[300] : const Color(0xff658C58),
+                  foregroundColor: Colors.white,
                 ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: controller,
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    hintText: "Write down ${data.name}'s progress here...",
-                    hintStyle: TextStyle(
-                      color: isDark ? Colors.grey[500] : Colors.grey[600],
-                    ),
-                    filled: true,
-                    fillColor:
-                        isDark ? Colors.grey[850] : const Color(0xffF7F7F7),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                ),
-                const SizedBox(height: 14),
-                ElevatedButton(
-                  onPressed: () async {
-                    final note = controller.text.trim();
-                    if (note.isEmpty) return;
-
-                    FocusScope.of(context).unfocus();
-
-                    final date =
-                        DateFormat('yyyy-MM-dd').format(DateTime.now());
-                    final userId = dataUser?.id ?? 0;
-
-                    final journal = JournalModel(
-                      userId: userId,
-                      title: data.name,
-                      content: note,
-                      date: date,
-                    );
-
-                    await DbHelper.addJournal(journal);
-
-                    setState(() {
-                      lastJournalMap[data.id ?? 0] = journal;
-                    });
-
-                    controller.clear();
-                    Navigator.pop(context);
-
-                    _showSaveDialog(context, data.name);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        isDark ? Colors.green[300] : const Color(0xff658C58),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Text("Save"),
-                ),
-              ],
-            ),
+                child: const Text("Save"),
+              ),
+            ],
           ),
         );
       },
     );
   }
 
+  // =====================================================
+  // SAVE CONFIRMATION
+  // =====================================================
   void _showSaveDialog(BuildContext context, String plantName) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (_) => AlertDialog(
         backgroundColor: isDark ? Colors.grey[900] : Colors.white,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
         title: Text(
           "Journal saved! 🌿",
           style: TextStyle(
@@ -405,7 +405,9 @@ class _JournalPageAgreenState extends State<JournalPageAgreen> {
         ),
         content: Text(
           "$plantName progress has been recorded.",
-          style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[800]),
+          style: TextStyle(
+            color: isDark ? Colors.grey[300] : Colors.grey[800],
+          ),
         ),
         actions: [
           TextButton(

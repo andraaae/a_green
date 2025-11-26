@@ -1,20 +1,23 @@
-import 'package:a_green/aGreen/database/db_helper.dart';
-import 'package:a_green/aGreen/database/preferrence.dart';
-import 'package:a_green/aGreen/models/plant_model.dart';
+import 'package:a_green/aGreen/database/preference_handler_firebase.dart';
+import 'package:a_green/aGreen/models/plant_model_firebase.dart';
+import 'package:a_green/aGreen/service/firebase.dart';
+import 'package:a_green/aGreen/service/notification_service.dart'; // ⬅️ TAMBAHKAN INI
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 
-class AddPlantsAgreen extends StatefulWidget {
-  const AddPlantsAgreen({super.key});
+class AddPlantsFirebase extends StatefulWidget {
+  const AddPlantsFirebase({super.key});
 
   @override
-  State<AddPlantsAgreen> createState() => _AddPlantsAgreenState();
+  State<AddPlantsFirebase> createState() => _AddPlantsFirebaseState();
 }
 
-class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
+class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
   final formKey = GlobalKey<FormState>();
   final plantname = TextEditingController();
+  
   String? dropDownType;
   String? dropDownFrequency;
   DateTime? selectedDate;
@@ -32,7 +35,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
     "Orchid",
     "Jasmine",
     "Rose",
-    "frangipani",
+    "Frangipani",
     "Bougenville",
     "Hibiscus",
     "Lotus",
@@ -110,7 +113,7 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
       firstDate: DateTime(2023),
       lastDate: DateTime(2100),
     );
-    if (picked != null && picked != selectedDate) {
+    if (picked != null) {
       setState(() {
         selectedDate = picked;
       });
@@ -155,7 +158,6 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                 ),
                 const SizedBox(height: 20),
 
-                //PLANT NAME
                 _buildLabel("Plant's Name", isDark),
                 _buildTextField(
                   controller: plantname,
@@ -163,7 +165,6 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                   theme: theme,
                 ),
 
-                //TYPE OF PLANT
                 const SizedBox(height: 30),
                 _buildLabel("Type of Plant", isDark),
                 _buildDropdown(
@@ -174,7 +175,6 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                   theme: theme,
                 ),
 
-                //FREQUENCY
                 const SizedBox(height: 30),
                 _buildLabel("Watering Frequency", isDark),
                 _buildDropdown(
@@ -186,14 +186,15 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                   theme: theme,
                 ),
 
-                //LAST WATERED DATE
                 const SizedBox(height: 30),
                 _buildLabel("Last Watered Date", isDark),
                 GestureDetector(
                   onTap: () => _selectDate(context),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 14),
+                      horizontal: 15,
+                      vertical: 14,
+                    ),
                     decoration: BoxDecoration(
                       color: theme.cardColor,
                       borderRadius: BorderRadius.circular(20),
@@ -207,13 +208,10 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
                     child: Text(
                       selectedDate == null
                           ? 'Select date'
-                          : DateFormat('dd MMMM yyyy').format(selectedDate!),
-                      textAlign: TextAlign.center,
+                          : DateFormat('yyyy-MM-dd').format(selectedDate!),
                       style: TextStyle(
                         color: selectedDate == null
-                            ? (isDark
-                                ? Colors.grey[400]
-                                : Colors.grey.shade600)
+                            ? (isDark ? Colors.grey[400] : Colors.grey.shade600)
                             : theme.colorScheme.onSurface,
                         fontSize: 14,
                       ),
@@ -223,35 +221,73 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
 
                 const SizedBox(height: 45),
 
-                //SAVE BUTTON
+                // ============================
+                //   🔥  TOMBOL SAVE
+                // ============================
                 ElevatedButton(
                   onPressed: () async {
                     if (!formKey.currentState!.validate()) return;
                     if (selectedDate == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text('Please select last watered date!')),
+                          content: Text('Please select last watered date!'),
+                        ),
                       );
                       return;
                     }
 
-                    final int? userId = await PreferenceHandler.getUid();
-                    if (userId == null) {
-                      debugPrint("User ID not found, please login again");
+                    final String? uid =
+                        await PreferenceHandlerFirebase.getUid();
+
+                    if (uid == null) {
+                      debugPrint("User UID not found, please login again");
                       return;
                     }
 
-                    final PlantModel data = PlantModel(
-                      userId: userId,
+                    final plantFirebase = PlantModelFirebase(
+                      userUid: uid,
                       name: plantname.text.trim(),
                       plant: dropDownType!,
+                      status: "active",
                       frequency: dropDownFrequency!,
-                      status: "Active",
-                      lastWateredDate: selectedDate!.toIso8601String(),
+                      lastWateredDate: DateFormat(
+                        "yyyy-MM-dd",
+                      ).format(selectedDate!),
                     );
 
-                    await DbHelper.addPlant(data);
-                    Navigator.pop(context);
+                    try {
+                      // 1️⃣ SIMPAN KE FIREBASE
+                      final docRef = await FirebaseFirestore.instance
+                          .collection("plants")
+                          .add(plantFirebase.ToFirestore());
+
+                      // 2️⃣ HITUNG FREQUENCY (ambil angka)
+                      final match = RegExp(
+                        r'\d+',
+                      ).firstMatch(dropDownFrequency!);
+                      int freqDays = match != null
+                          ? int.parse(match.group(0)!)
+                          : 3;
+
+                      // 3️⃣ SCHEDULE NOTIFICATION
+                      await NotificationService.scheduleWateringNotification(
+                        id: docRef.id.hashCode,
+                        plantName: plantFirebase.name,
+                        days: freqDays,
+                      );
+
+                      // 4️⃣ POP + SNACKBAR
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Plant added successfully!"),
+                        ),
+                      );
+
+                      Navigator.pop(context);
+                    } catch (e) {
+                      debugPrint("Error adding plant: $e");
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isDark
@@ -279,44 +315,38 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
     );
   }
 
+  // UI HELPERS
   Widget _buildLabel(String text, bool isDark) => Row(
-        children: [
-          Text(
-            text,
-            style: TextStyle(
-              color: isDark ? Colors.grey[200] : const Color(0xff55695A),
-            ),
-          ),
-        ],
-      );
+    children: [
+      Text(
+        text,
+        style: TextStyle(
+          color: isDark ? Colors.grey[200] : const Color(0xff55695A),
+        ),
+      ),
+    ],
+  );
 
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
     required ThemeData theme,
-  }) =>
-      Padding(
-        padding: const EdgeInsets.only(top: 7),
-        child: TextFormField(
-          controller: controller,
-          textAlign: TextAlign.center,
-          validator: (value) =>
-              value == null || value.isEmpty ? "Required" : null,
-          decoration: InputDecoration(
-            isDense: true,
-            hintText: hintText,
-            hintStyle: TextStyle(
-              fontSize: 12,
-              color: theme.hintColor,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            filled: true,
-            fillColor: theme.cardColor,
-          ),
-        ),
-      );
+  }) => Padding(
+    padding: const EdgeInsets.only(top: 7),
+    child: TextFormField(
+      controller: controller,
+      textAlign: TextAlign.center,
+      validator: (value) => value == null || value.isEmpty ? "Required" : null,
+      decoration: InputDecoration(
+        isDense: true,
+        hintText: hintText,
+        hintStyle: TextStyle(fontSize: 12, color: theme.hintColor),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+        filled: true,
+        fillColor: theme.cardColor,
+      ),
+    ),
+  );
 
   Widget _buildDropdown({
     required String hint,
@@ -324,48 +354,44 @@ class _AddPlantsAgreenState extends State<AddPlantsAgreen> {
     required String? value,
     required Function(String?) onChanged,
     required ThemeData theme,
-  }) =>
-      Padding(
-        padding: const EdgeInsets.only(top: 7),
-        child: DropdownButtonFormField2<String>(
-          value: value,
-          isExpanded: true,
-          decoration: InputDecoration(
-            isDense: true,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            filled: true,
-            fillColor: theme.cardColor,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-          ),
-          hint: Center(
-            child: Text(
-              hint,
-              style: TextStyle(
-                fontSize: 12,
-                color: theme.hintColor,
-              ),
-            ),
-          ),
-          dropdownStyleData: DropdownStyleData(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: theme.cardColor,
-            ),
-            elevation: 2,
-            offset: const Offset(0, -5),
-          ),
-          validator: (val) => val == null ? "Select one" : null,
-          items: items.map((String item) {
-            return DropdownMenuItem<String>(
-              value: item,
-              alignment: Alignment.center,
-              child: Text(item, textAlign: TextAlign.center),
-            );
-          }).toList(),
-          onChanged: onChanged,
+  }) => Padding(
+    padding: const EdgeInsets.only(top: 7),
+    child: DropdownButtonFormField2<String>(
+      value: value,
+      isExpanded: true,
+      decoration: InputDecoration(
+        isDense: true,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+        filled: true,
+        fillColor: theme.cardColor,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 12,
         ),
-      );
+      ),
+      hint: Center(
+        child: Text(
+          hint,
+          style: TextStyle(fontSize: 12, color: theme.hintColor),
+        ),
+      ),
+      dropdownStyleData: DropdownStyleData(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: theme.cardColor,
+        ),
+        elevation: 2,
+        offset: const Offset(0, -5),
+      ),
+      validator: (val) => val == null ? "Select one" : null,
+      items: items.map((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          alignment: Alignment.center,
+          child: Text(item, textAlign: TextAlign.center),
+        );
+      }).toList(),
+      onChanged: onChanged,
+    ),
+  );
 }

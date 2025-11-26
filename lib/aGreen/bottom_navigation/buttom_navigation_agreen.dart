@@ -1,10 +1,11 @@
 import 'package:a_green/aGreen/view/add_plants_agreen.dart';
-import 'package:a_green/aGreen/view/home_page_agreen.dart';
+import 'package:a_green/aGreen/view/add_plants_firebase.dart';
 import 'package:a_green/aGreen/view/home_page_firebase.dart';
+import 'package:a_green/aGreen/view/journal_firebase.dart';
 import 'package:a_green/aGreen/view/journal_page_agreen.dart';
-import 'package:a_green/aGreen/view/profile_agreen.dart';
 import 'package:a_green/aGreen/view/profile_firebase.dart';
 import 'package:a_green/aGreen/view/reminder_agreen.dart';
+import 'package:a_green/aGreen/view/reminder_firebase.dart';
 import 'package:flutter/material.dart';
 
 class ButtomNavigationAgreen extends StatefulWidget {
@@ -22,9 +23,9 @@ class _ButtomNavigationAgreenState extends State<ButtomNavigationAgreen> {
     super.initState();
     _pages = [
       HomePageFirebase(), //sampe sini
-      ReminderAgreen(),
+      ReminderFirebase(),
       const SizedBox(), // kosong untuk posisi tombol add
-      JournalPageAgreen(),
+      JournalFirebase(),
       ProfileFirebase(),
     ];
   }
@@ -40,7 +41,7 @@ class _ButtomNavigationAgreenState extends State<ButtomNavigationAgreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddPlantsAgreen()),
+            MaterialPageRoute(builder: (context) => AddPlantsFirebase()),
           );
         },
         child: const Icon(Icons.add, size: 30),

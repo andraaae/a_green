@@ -27,7 +27,7 @@ class _ProfileAgreenState extends State<ProfileAgreen> {
   }
 
   Future<void> getData() async {
-    var id = await PreferenceHandler.getId();
+    var id = await PreferenceHandler.getUid();
     if (id != null) {
       UserModel? result = await DbHelper.getUser(id);
       setState(() {

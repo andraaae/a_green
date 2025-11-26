@@ -1,3 +1,4 @@
+import 'package:a_green/aGreen/service/notification_service.dart';
 import 'package:a_green/aGreen/view/splash_screen.dart';
 import 'package:a_green/firebase_options.dart';
 import 'package:a_green/theme/theme_provider.dart';
@@ -8,8 +9,9 @@ import 'package:provider/provider.dart';
 
 void main() async {
    WidgetsFlutterBinding.ensureInitialized();
-  // await initializeDateFormatting('id_ID', null);
+  //  await initializeDateFormatting('id_ID', null);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await NotificationService.init();
   runApp(
     MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => ThemeProvider())],

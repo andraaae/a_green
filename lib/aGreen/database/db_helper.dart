@@ -88,7 +88,7 @@ class DbHelper {
     );
     if (result.isNotEmpty) {
       final dataUser = UserModel.fromMap(result.first);
-      PreferenceHandler.saveId(dataUser.id!);
+      PreferenceHandler.saveUid(dataUser.id!);
       return dataUser;
     }
     return null;
