@@ -8,6 +8,10 @@ class FirebaseService {
   static final FirebaseAuth auth = FirebaseAuth.instance;
   static final FirebaseFirestore firestore = FirebaseFirestore.instance;
   static final _firestore = FirebaseFirestore.instance;
+  static int extractDays(String freq) {
+    final match = RegExp(r'\d+').firstMatch(freq);
+    return match != null ? int.parse(match.group(0)!) : 3;
+  }
 
   // REGISTER USER
   static Future<UserFirebaseModel> registerUser({
@@ -120,10 +124,7 @@ class FirebaseService {
         .toList();
   }
 
-
-   // =======================
   // JOURNAL SECTION
-  // =======================
 
   /// ADD JOURNAL (dipakai di JournalPage)
   static Future<void> addJournal(JournalModelFirebase journal) async {

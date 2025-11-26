@@ -17,7 +17,7 @@ class AddPlantsFirebase extends StatefulWidget {
 class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
   final formKey = GlobalKey<FormState>();
   final plantname = TextEditingController();
-  
+
   String? dropDownType;
   String? dropDownFrequency;
   DateTime? selectedDate;
@@ -99,9 +99,10 @@ class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
   ];
 
   final List<String> frequencyitem = [
-    "1-2 weeks",
-    "Every 2-3 days",
-    "Every 3-4 days",
+    "1 weeks",
+    "2 weeks",
+    "Every 3 days",
+    "Every 4 days",
     "Every 2 days",
     "Every day",
   ];
@@ -221,9 +222,7 @@ class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
 
                 const SizedBox(height: 45),
 
-                // ============================
-                //   🔥  TOMBOL SAVE
-                // ============================
+                // TOMBOL SAVE
                 ElevatedButton(
                   onPressed: () async {
                     if (!formKey.currentState!.validate()) return;

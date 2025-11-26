@@ -43,10 +43,10 @@ class NotificationService {
 
       // Wajib di versions baru:
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-
+      // uiLocalNotificationDateInterpretation:
+      //     UILocalNotificationDateInterpretation.absoluteTime,
       // DUA PARAMETER INI SUDAH DIHAPUS DI VERSI BARU:
-      // uiLocalNotificationDateInterpretation: ...
-      // androidAllowWhileIdle: ...
+     
       
       matchDateTimeComponents: null,
     );
