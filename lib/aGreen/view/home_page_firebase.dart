@@ -2,6 +2,7 @@ import 'package:a_green/aGreen/database/preference_handler_firebase.dart';
 import 'package:a_green/aGreen/models/plant_model_firebase.dart';
 import 'package:a_green/aGreen/models/user_firebase.dart';
 import 'package:a_green/aGreen/service/firebase.dart';
+import 'package:a_green/aGreen/service/notification_service.dart';
 import 'package:a_green/aGreen/view/plant_tips.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -400,6 +401,12 @@ class _HomePageFirebaseState extends State<HomePageFirebase> {
                   ),
                 ),
               ),
+              // ElevatedButton(
+              //   onPressed: () async {
+              //     await NotificationService.test();
+              //   },
+              //   child: const Text("Test Notification"),
+              // ),
             ],
           ),
         ),

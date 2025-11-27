@@ -29,9 +29,7 @@ class _JournalFirebaseState extends State<JournalFirebase> {
     getData();
   }
 
-  // =====================================================
   // 🔥 FIREBASE VERSION OF FETCHING DATA
-  // =====================================================
   Future<void> getData() async {
     final uid = await PreferenceHandlerFirebase.getUid();
     if (uid == null) return;
@@ -65,9 +63,7 @@ class _JournalFirebaseState extends State<JournalFirebase> {
     });
   }
 
-  // =====================================================
   // FILTER SEARCH
-  // =====================================================
   void _filterPlants(String query) {
     setState(() {
       _searchQuery = query;
@@ -86,9 +82,7 @@ class _JournalFirebaseState extends State<JournalFirebase> {
     });
   }
 
-  // =====================================================
   // UI BELOW (TIDAK DIUBAH)
-  // =====================================================
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -190,9 +184,9 @@ class _JournalFirebaseState extends State<JournalFirebase> {
 
               const SizedBox(height: 16),
 
-              // =====================================================
+          
               // LIST PLANTS
-              // =====================================================
+          
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(8),
@@ -279,9 +273,7 @@ class _JournalFirebaseState extends State<JournalFirebase> {
     );
   }
 
-  // =====================================================
   // BOTTOM SHEET – ADD JOURNAL (FIREBASE VERSION)
-  // =====================================================
   void _showJournalSheet(BuildContext context, PlantModelFirebase plant) {
     final controller = TextEditingController();
     final theme = Theme.of(context);
@@ -382,9 +374,7 @@ class _JournalFirebaseState extends State<JournalFirebase> {
     );
   }
 
-  // =====================================================
   // SAVE CONFIRMATION
-  // =====================================================
   void _showSaveDialog(BuildContext context, String plantName) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;

@@ -1,6 +1,6 @@
 import 'package:a_green/aGreen/database/preference_handler_firebase.dart';
 import 'package:a_green/aGreen/models/plant_model_firebase.dart';
-import 'package:a_green/aGreen/service/firebase.dart';
+// import 'package:a_green/aGreen/service/firebase.dart';
 import 'package:a_green/aGreen/service/notification_service.dart'; // ⬅️ TAMBAHKAN INI
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -127,6 +127,7 @@ class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -237,7 +238,6 @@ class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
 
                     final String? uid =
                         await PreferenceHandlerFirebase.getUid();
-
                     if (uid == null) {
                       debugPrint("User UID not found, please login again");
                       return;
@@ -255,12 +255,12 @@ class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
                     );
 
                     try {
-                      // 1️⃣ SIMPAN KE FIREBASE
+                      // SIMPAN KE FIREBASE
                       final docRef = await FirebaseFirestore.instance
                           .collection("plants")
                           .add(plantFirebase.ToFirestore());
 
-                      // 2️⃣ HITUNG FREQUENCY (ambil angka)
+                      // Ambil angka dari frequency
                       final match = RegExp(
                         r'\d+',
                       ).firstMatch(dropDownFrequency!);
@@ -268,15 +268,42 @@ class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
                           ? int.parse(match.group(0)!)
                           : 3;
 
-                      // 3️⃣ SCHEDULE NOTIFICATION
-                      await NotificationService.scheduleWateringNotification(
-                        id: docRef.id.hashCode,
-                        plantName: plantFirebase.name,
-                        days: freqDays,
-                      );
+                      // JADWALKAN NOTIF (normal)
+                      try {
+                        await NotificationService.scheduleWateringWithAlarm(
+                          id: docRef.id.hashCode,
+                          plantName: plantFirebase.name,
+                          days: freqDays,
+                        );
 
-                      // 4️⃣ POP + SNACKBAR
-                      if (!mounted) return;
+                        // buat notifikasi saat app di-kill
+                        await NotificationService.scheduleWateringWithAlarm(
+                          id: docRef.id.hashCode + 999999, // ID beda wajib
+                          days: freqDays,
+                          plantName: plantFirebase.name,
+                        );
+                      } catch (e) {
+                        debugPrint("Notification schedule error: $e");
+                        // jika scheduling exact alarm gagal, coba buka settings (method ada di NotificationService)
+                        try {
+                          await NotificationService.openExactAlarmSettings();
+                        } catch (_) {
+                          // swallow - bukan fatal untuk save
+                        }
+                      }
+
+                      // TEST NOTIFICATION (OTOMATIS, TANPA TOMBOL)
+                      // pastikan plugin di-init dulu (aman jika sudah pernah di-init)
+                      try {
+                        await NotificationService.init();
+                        // kirim notifikasi langsung sebagai test
+                        await NotificationService.test();
+                      } catch (e) {
+                        debugPrint("Test notification error: $e");
+                        // jangan blokir flow utama kalau gagal
+                      }
+
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("Plant added successfully!"),
@@ -288,6 +315,7 @@ class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
                       debugPrint("Error adding plant: $e");
                     }
                   },
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isDark
                         ? theme.colorScheme.primary

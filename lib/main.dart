@@ -2,16 +2,20 @@ import 'package:a_green/aGreen/service/notification_service.dart';
 import 'package:a_green/aGreen/view/splash_screen.dart';
 import 'package:a_green/firebase_options.dart';
 import 'package:a_green/theme/theme_provider.dart';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 // import 'package:intl/date_symbol_data_file.dart';
 import 'package:provider/provider.dart';
+// import 'dart:io';
 
 void main() async {
-   WidgetsFlutterBinding.ensureInitialized();
-  //  await initializeDateFormatting('id_ID', null);
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id_ID');
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    await NotificationService.init();
+  await NotificationService.init();
+  // await AndroidAlarmManager.initialize();
   runApp(
     MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => ThemeProvider())],
