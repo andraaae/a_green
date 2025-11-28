@@ -86,8 +86,9 @@ class _RegisterFirebaseState extends State<RegisterFirebase> {
                     prefixIcon: const Icon(Icons.mail),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty)
+                    if (value == null || value.isEmpty) {
                       return 'Email cannot be empty';
+                    }
                     if (!value.contains('@')) return 'Email is invalid';
                     return null;
                   },
@@ -147,10 +148,12 @@ class _RegisterFirebaseState extends State<RegisterFirebase> {
                     ),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty)
+                    if (value == null || value.isEmpty) {
                       return 'Password cannot be empty';
-                    if (value.length < 7)
+                    }
+                    if (value.length < 7) {
                       return 'Minimum password length 7 characters';
+                    }
                     return null;
                   },
                 ),
@@ -181,7 +184,7 @@ class _RegisterFirebaseState extends State<RegisterFirebase> {
 
                             try {
                               // CALL FIREBASE SERVICE
-                              final UserFirebaseModel? user =
+                              final UserFirebaseModel user =
                                   await FirebaseService.registerUser(
                                     email: emailController.text.trim(),
                                     username: nameController.text.trim(),
@@ -196,19 +199,18 @@ class _RegisterFirebaseState extends State<RegisterFirebase> {
                                 return;
                               }
 
-                              // 🔥 SIMPAN UID
                               await PreferenceHandlerFirebase.saveUid(
                                 user.uid!,
                               );
 
-                              // 🔥 SIMPAN STATUS LOGIN
+
                               await PreferenceHandlerFirebase.saveLogin(true);
 
                               Fluttertoast.showToast(
                                 msg: "Register successful!",
                               );
 
-                              // ➜ AUTO MASUK KE HOME
+                              // AUTO MASUK KE HOME
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(

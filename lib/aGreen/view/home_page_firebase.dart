@@ -3,11 +3,13 @@ import 'package:a_green/aGreen/models/plant_model_firebase.dart';
 import 'package:a_green/aGreen/models/user_firebase.dart';
 import 'package:a_green/aGreen/service/firebase.dart';
 import 'package:a_green/aGreen/service/notification_service.dart';
-import 'package:a_green/aGreen/view/plant_tips.dart';
+// import 'package:a_green/aGreen/view/plant_tips.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class HomePageFirebase extends StatefulWidget {
   const HomePageFirebase({super.key});
@@ -20,12 +22,45 @@ class _HomePageFirebaseState extends State<HomePageFirebase> {
   UserFirebaseModel? dataUser;
   String? uid;
   bool loading = true;
+  Future<void> checkAutoNotification(PlantModelFirebase plant) async {
+    // Cegah double notif
+    if (plant.hasNotified == true) return;
+
+    final progress = calculateProgress(plant);
+    final needsWater = isTimeToWaterPlant(plant);
+
+    // Kalau progress 100% dan sudah saatnya disiram ada notif
+    if (progress >= 1.0 && needsWater) {
+      print("MENGIRIM NOTIF UNTUK ${plant.name}");
+
+      await NotificationService();
+
+      // update Firestore → supaya tidak notif terus
+      await FirebaseFirestore.instance
+          .collection("plants")
+          .doc(plant.id)
+          .update({"hasNotified": true});
+
+      print("NOTIFIKASI TERKIRIM DAN DITANDAI");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     loadData();
   }
+
+  // void listenFCMTokenRefresh() {
+  //   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+  //     print("FCM TOKEN UPDATED: $newToken");
+  //     if (uid != null) {
+  //       FirebaseFirestore.instance.collection("users").doc(uid).update({
+  //         "fcmToken": newToken,
+  //       });
+  //     }
+  //   });
+  // }
 
   void confirmDelete(PlantModelFirebase plant) {
     showDialog(
@@ -124,6 +159,7 @@ class _HomePageFirebaseState extends State<HomePageFirebase> {
     await FirebaseFirestore.instance.collection("plants").doc(plant.id).update({
       ...plant.ToFirestore(),
       "lastWateredDate": DateFormat("yyyy-MM-dd").format(DateTime.now()),
+      "hasNotified": false, // RESET NOTIF
     });
 
     ScaffoldMessenger.of(
@@ -195,8 +231,9 @@ class _HomePageFirebaseState extends State<HomePageFirebase> {
 
   @override
   Widget build(BuildContext context) {
-    if (loading)
+    if (loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     if (uid == null) {
       return const Scaffold(
@@ -293,6 +330,9 @@ class _HomePageFirebaseState extends State<HomePageFirebase> {
                           final progress = calculateProgress(plant);
                           final needsWater = isTimeToWaterPlant(plant);
 
+                          // CEK NOTIFIKASI OTOMATIS
+                          checkAutoNotification(plant);
+
                           return Container(
                             margin: const EdgeInsets.only(bottom: 16),
                             padding: const EdgeInsets.all(14),
@@ -364,15 +404,13 @@ class _HomePageFirebaseState extends State<HomePageFirebase> {
 
                                 const SizedBox(height: 8),
 
-                                // ICON BUTTONS (water icon color changes when needs watering,
-                                // delete icon is soft red)
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     IconButton(
                                       icon: const Icon(Icons.water_drop),
                                       color: needsWater
-                                          ? const Color(0xff80A1BA)
+                                          ? const Color(0xff6A8A7A)
                                           : const Color(0xff6A8A7A),
                                       onPressed: () => waterPlant(plant),
                                     ),

@@ -67,7 +67,7 @@ class AboutAgreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Version: 2.0.0\n'
-            'Developed by: and\n'
+            'Developed by: andra\n'
             'Contact: agreen.support@gmail.com',
             style: TextStyle(fontSize: 14, color: subTextColor),
           ),

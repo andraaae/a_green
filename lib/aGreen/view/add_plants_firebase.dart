@@ -4,6 +4,7 @@ import 'package:a_green/aGreen/models/plant_model_firebase.dart';
 import 'package:a_green/aGreen/service/notification_service.dart'; // ⬅️ TAMBAHKAN INI
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 
@@ -17,6 +18,7 @@ class AddPlantsFirebase extends StatefulWidget {
 class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
   final formKey = GlobalKey<FormState>();
   final plantname = TextEditingController();
+  bool TEST_MODE = true; // ubah ke false kalau sudah selesai testing
 
   String? dropDownType;
   String? dropDownFrequency;
@@ -127,7 +129,7 @@ class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -255,10 +257,13 @@ class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
                     );
 
                     try {
-                      // SIMPAN KE FIREBASE
+                      // SIMPAN KE FIREBASE + hasNotified
                       final docRef = await FirebaseFirestore.instance
                           .collection("plants")
-                          .add(plantFirebase.ToFirestore());
+                          .add({
+                            ...plantFirebase.ToFirestore(),
+                            "hasNotified": false, // ⬅️ STEP 1 BERHASIL DIPASANG
+                          });
 
                       // Ambil angka dari frequency
                       final match = RegExp(
@@ -268,7 +273,24 @@ class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
                           ? int.parse(match.group(0)!)
                           : 3;
 
-                      // JADWALKAN NOTIF (normal)
+                      // TEST MODE — dipercepat jadi 10 detik atau 30 detik
+                      // final testDuration = Duration(seconds: 10);
+
+                      // PRODUKSI MODE — tetap hari
+                      // final productionDuration = Duration(days: freqDays);
+
+                      // PILIH DARI MODE
+                      // final scheduleDuration = TEST_MODE
+                      //     ? testDuration
+                      //     : productionDuration;
+
+                      // await NotificationService.scheduleWateringTestable(
+                      //   id: docRef.id.hashCode,
+                      //   plantName: plantFirebase.name,
+                      //   duration: scheduleDuration,
+                      // );
+
+                      // JADWALKAN NOTIF ALARM-KILL
                       try {
                         await NotificationService.scheduleWateringWithAlarm(
                           id: docRef.id.hashCode,
@@ -276,31 +298,25 @@ class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
                           days: freqDays,
                         );
 
-                        // buat notifikasi saat app di-kill
                         await NotificationService.scheduleWateringWithAlarm(
-                          id: docRef.id.hashCode + 999999, // ID beda wajib
+                          id: docRef.id.hashCode + 999999,
                           days: freqDays,
                           plantName: plantFirebase.name,
                         );
                       } catch (e) {
                         debugPrint("Notification schedule error: $e");
-                        // jika scheduling exact alarm gagal, coba buka settings (method ada di NotificationService)
+
                         try {
                           await NotificationService.openExactAlarmSettings();
-                        } catch (_) {
-                          // swallow - bukan fatal untuk save
-                        }
+                        } catch (_) {}
                       }
 
-                      // TEST NOTIFICATION (OTOMATIS, TANPA TOMBOL)
-                      // pastikan plugin di-init dulu (aman jika sudah pernah di-init)
+                      // TEST NOTIF
                       try {
                         await NotificationService.init();
-                        // kirim notifikasi langsung sebagai test
-                        await NotificationService.test();
+                        NotificationDetails();
                       } catch (e) {
                         debugPrint("Test notification error: $e");
-                        // jangan blokir flow utama kalau gagal
                       }
 
                       if (!context.mounted) return;

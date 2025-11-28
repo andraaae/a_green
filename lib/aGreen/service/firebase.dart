@@ -115,23 +115,17 @@ class FirebaseService {
         .get();
 
     return query.docs
-        .map(
-          (doc) => PlantModelFirebase.fromMap(
-            doc.data() as Map<String, dynamic>,
-            doc.id,
-          ),
-        )
+        .map((doc) => PlantModelFirebase.fromMap(doc.data(), doc.id))
         .toList();
   }
 
-  // JOURNAL SECTION
 
-  /// ADD JOURNAL (dipakai di JournalPage)
+  // ADD JOURNAL (dipakai di JournalPage)
   static Future<void> addJournal(JournalModelFirebase journal) async {
     await _firestore.collection("journals").add(journal.toFirestore());
   }
 
-  /// GET JOURNAL BY PLANT + DATE (dipakai buat last note di JournalPage)
+  // GET JOURNAL BY PLANT + DATE (dipakai buat last note di JournalPage)
   static Future<JournalModelFirebase?> getJournalByPlantAndDate(
     String userUid,
     String plantName,
@@ -149,13 +143,10 @@ class FirebaseService {
 
     final doc = query.docs.first;
 
-    return JournalModelFirebase.fromMap(
-      doc.data() as Map<String, dynamic>,
-      doc.id,
-    );
+    return JournalModelFirebase.fromMap(doc.data(), doc.id);
   }
 
-  /// (Optional) GET ALL JOURNALS USER – mungkin kepake nanti
+  // (Optional) GET ALL JOURNALS USER – mungkin kepake nanti
   static Future<List<JournalModelFirebase>> getJournalsByUser(
     String userUid,
   ) async {
@@ -166,12 +157,7 @@ class FirebaseService {
         .get();
 
     return query.docs
-        .map(
-          (doc) => JournalModelFirebase.fromMap(
-            doc.data() as Map<String, dynamic>,
-            doc.id,
-          ),
-        )
+        .map((doc) => JournalModelFirebase.fromMap(doc.data(), doc.id))
         .toList();
   }
 }

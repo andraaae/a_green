@@ -107,56 +107,54 @@ class _ReminderFirebaseState extends State<ReminderFirebase> {
               const SizedBox(height: 20),
 
               // notification row
-              Container(
-                width: double.infinity,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.grey[850] : Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    Icon(
-                      isOn
-                          ? Icons.notifications_active
-                          : Icons.notifications_off,
-                      color: isOn
-                          ? Colors.greenAccent
-                          : (isDark ? Colors.grey : Colors.grey),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Notification",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Colors.black,
-                            ),
-                          ),
-                          Text(
-                            isOn ? "Active" : "Inactive",
-                            style: TextStyle(
-                              color: isDark ? Colors.grey[400] : Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Switch(
-                      value: isActive,
-                      onChanged: updateNotificationStatus,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
+              // Container(
+              //   width: double.infinity,
+              //   height: 70,
+              //   decoration: BoxDecoration(
+              //     color: isDark ? Colors.grey[850] : Colors.white,
+              //     borderRadius: BorderRadius.circular(12),
+              //   ),
+              //   padding: const EdgeInsets.symmetric(horizontal: 16),
+              //   child: Row(
+              //     children: [
+              //       Icon(
+              //         isOn
+              //             ? Icons.notifications_active
+              //             : Icons.notifications_off,
+              //         color: isOn
+              //             ? Colors.greenAccent
+              //             : (isDark ? Colors.grey : Colors.grey),
+              //       ),
+              //       const SizedBox(width: 12),
+              //       Expanded(
+              //         child: Column(
+              //           crossAxisAlignment: CrossAxisAlignment.start,
+              //           mainAxisAlignment: MainAxisAlignment.center,
+              //           children: [
+              //             Text(
+              //               "Notification",
+              //               style: TextStyle(
+              //                 fontWeight: FontWeight.bold,
+              //                 color: isDark ? Colors.white : Colors.black,
+              //               ),
+              //             ),
+              //             Text(
+              //               isOn ? "Active" : "Inactive",
+              //               style: TextStyle(
+              //                 color: isDark ? Colors.grey[400] : Colors.grey,
+              //               ),
+              //             ),
+              //           ],
+              //         ),
+              //       ),
+              //       Switch(
+              //         value: isActive,
+              //         onChanged: updateNotificationStatus,
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 30),
               Text(
                 "Upcoming Schedule",
                 style: TextStyle(

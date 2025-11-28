@@ -54,4 +54,6 @@ class NotificationHelper {
   static Future<void> cancelAll() async {
     await _notificationsPlugin.cancelAll();
   }
+  
+  
 }

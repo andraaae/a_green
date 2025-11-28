@@ -17,7 +17,7 @@ class PlantModel {
     required this.plant,
     required this.status,
     required this.frequency,
-    this.lastWateredDate, 
+    this.lastWateredDate,
   });
 
   Map<String, dynamic> toMap() {
@@ -28,7 +28,7 @@ class PlantModel {
       'plant': plant,
       'status': status,
       'frequency': frequency,
-      'lastWateredDate': lastWateredDate, 
+      'lastWateredDate': lastWateredDate,
     };
   }
 

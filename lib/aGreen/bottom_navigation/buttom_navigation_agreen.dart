@@ -1,10 +1,7 @@
-import 'package:a_green/aGreen/view/add_plants_agreen.dart';
 import 'package:a_green/aGreen/view/add_plants_firebase.dart';
 import 'package:a_green/aGreen/view/home_page_firebase.dart';
 import 'package:a_green/aGreen/view/journal_firebase.dart';
-import 'package:a_green/aGreen/view/journal_page_agreen.dart';
 import 'package:a_green/aGreen/view/profile_firebase.dart';
-import 'package:a_green/aGreen/view/reminder_agreen.dart';
 import 'package:a_green/aGreen/view/reminder_firebase.dart';
 import 'package:flutter/material.dart';
 

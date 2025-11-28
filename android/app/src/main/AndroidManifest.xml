@@ -1,5 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- WAJIB untuk alarm background isolate -->
+    <meta-data
+        android:name="flutterEnableBackgroundIsolation"
+        android:value="true" />
+
     <!-- NOTIFICATION PERMISSION (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
@@ -35,21 +40,22 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-        </activity>
 
+        </activity>
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
 
-        <!-- ALARM MANAGER RECEIVER (WAJIB DI AKTIFKAN) -->
+        <!-- ALARM MANAGER RECEIVER (BENAR) -->
         <receiver
             android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmBroadcastReceiver"
             android:exported="false" />
 
+        <!-- REBOOT RECEIVER → exported harus FALSE -->
         <receiver
             android:name="dev.fluttercommunity.plus.androidalarmmanager.RebootBroadcastReceiver"
             android:enabled="true"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>

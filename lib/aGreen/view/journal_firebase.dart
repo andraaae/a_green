@@ -82,7 +82,6 @@ class _JournalFirebaseState extends State<JournalFirebase> {
     });
   }
 
-  // UI BELOW (TIDAK DIUBAH)
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -186,7 +185,6 @@ class _JournalFirebaseState extends State<JournalFirebase> {
 
           
               // LIST PLANTS
-          
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(8),

@@ -1,24 +1,37 @@
+// lib/a_green/service/alarm_callback.dart
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-/// ⚠ WAJIB: buat instance baru untuk background isolate
 final FlutterLocalNotificationsPlugin _notif =
     FlutterLocalNotificationsPlugin();
 
+// CALLBACK ALARM — DIPANGGIL DARI ANDROID ALARM MANAGER
 Future<void> alarmCallback(int id) async {
-  // WAJIB agar plugin bisa dipakai di background isolate
+  // Pastikan Flutter binding siap (background isolate)
   WidgetsFlutterBinding.ensureInitialized();
 
-  // WAJIB: initialize ulang di background
+  // Initialize plugin di background isolate (minimal)
+  // Gunakan drawable/ic_notification jika tersedia (lebih baik)
   const AndroidInitializationSettings androidInit =
-      AndroidInitializationSettings('@mipmap/launcher_icon');
+      AndroidInitializationSettings('@drawable/ic_notification');
 
-  const InitializationSettings initSettings =
-      InitializationSettings(android: androidInit);
+  const InitializationSettings initSettings = InitializationSettings(
+    android: androidInit,
+  );
 
-  await _notif.initialize(initSettings);
+  try {
+    await _notif.initialize(initSettings);
+  } catch (e) {
+    // fallback ke launcher icon jika drawable tidak tersedia
+    const AndroidInitializationSettings fallbackInit =
+        AndroidInitializationSettings('@mipmap/launcher_icon');
+    const InitializationSettings fallbackSettings = InitializationSettings(
+      android: fallbackInit,
+    );
+    await _notif.initialize(fallbackSettings);
+  }
 
-  // WAJIB: register channel ulang di background isolate
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'water_alarm',
     'Water Alarm',
@@ -28,10 +41,11 @@ Future<void> alarmCallback(int id) async {
 
   await _notif
       .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+        AndroidFlutterLocalNotificationsPlugin
+      >()
       ?.createNotificationChannel(channel);
 
-  // ⬅️ BARU: kirim notif
+  // Kirim notifikasi
   await _notif.show(
     id,
     "Watering Reminder 🌱",

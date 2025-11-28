@@ -61,16 +61,20 @@ class _ProfileFirebaseState extends State<ProfileFirebase> {
 
   // 🔥 Edit Profile (update Firestore)
   void _showEditProfileDialog() {
-    final TextEditingController nameController =
-        TextEditingController(text: dataUser?.username ?? "");
-    final TextEditingController emailController =
-        TextEditingController(text: dataUser?.email ?? "");
+    final TextEditingController nameController = TextEditingController(
+      text: dataUser?.username ?? "",
+    );
+    final TextEditingController emailController = TextEditingController(
+      text: dataUser?.email ?? "",
+    );
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           title: const Text("Edit Profile"),
           content: SingleChildScrollView(
             child: Column(
@@ -104,14 +108,11 @@ class _ProfileFirebaseState extends State<ProfileFirebase> {
                 final user = FirebaseAuth.instance.currentUser;
                 if (user == null) return;
 
-                await FirebaseService.updateUserData(
-                  user.uid,
-                  {
-                    "username": nameController.text.trim(),
-                    "email": emailController.text.trim(),
-                    "updateAt": DateTime.now().toIso8601String(),
-                  },
-                );
+                await FirebaseService.updateUserData(user.uid, {
+                  "username": nameController.text.trim(),
+                  "email": emailController.text.trim(),
+                  "updateAt": DateTime.now().toIso8601String(),
+                });
 
                 Navigator.pop(context);
                 await getData();
@@ -122,7 +123,8 @@ class _ProfileFirebaseState extends State<ProfileFirebase> {
                   context: context,
                   builder: (context) => AlertDialog(
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     title: const Text("Success"),
                     content: const Text("Your profile has been updated!"),
                     actions: [
@@ -177,16 +179,18 @@ class _ProfileFirebaseState extends State<ProfileFirebase> {
                             style: TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.bold,
-                              color:
-                                  isDark ? Colors.green[200] : const Color(0xff658C58),
+                              color: isDark
+                                  ? Colors.green[200]
+                                  : const Color(0xff658C58),
                             ),
                           ),
                           const SizedBox(width: 8),
                           Icon(
                             Icons.person,
                             size: 30,
-                            color:
-                                isDark ? Colors.green[200] : const Color(0xff658C58),
+                            color: isDark
+                                ? Colors.green[200]
+                                : const Color(0xff658C58),
                           ),
                         ],
                       ),
@@ -226,16 +230,21 @@ class _ProfileFirebaseState extends State<ProfileFirebase> {
                                     style: TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
-                                      color: isDark ? Colors.white : Colors.black,
+                                      color: isDark
+                                          ? Colors.white
+                                          : Colors.black,
                                     ),
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    email.isEmpty ? "No email available" : email,
+                                    email.isEmpty
+                                        ? "No email available"
+                                        : email,
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color:
-                                          isDark ? Colors.grey[400] : Colors.grey,
+                                      color: isDark
+                                          ? Colors.grey[400]
+                                          : Colors.grey,
                                     ),
                                   ),
                                   const SizedBox(height: 10),
@@ -270,40 +279,42 @@ class _ProfileFirebaseState extends State<ProfileFirebase> {
                       _buildSettingCard(
                         isDark: isDark,
                         icon: isDark ? Icons.dark_mode : Icons.sunny,
-                        iconColor:
-                            isDark ? const Color(0xffB7B89F) : const Color(0xffABE7B2),
+                        iconColor: isDark
+                            ? const Color(0xffB7B89F)
+                            : const Color(0xffABE7B2),
                         title: 'Theme',
                         subtitle: isDark ? 'Dark Mode' : 'Light Mode',
                         trailing: Switch(
                           value: themeProvider.isDarkMode,
-                          onChanged: (value) => themeProvider.toggleTheme(value),
+                          onChanged: (value) =>
+                              themeProvider.toggleTheme(value),
                         ),
                       ),
 
                       const SizedBox(height: 16),
 
                       // NOTIFICATION CARD
-                      _buildSettingCard(
-                        isDark: isDark,
-                        icon: isSounding
-                            ? Icons.notifications_active
-                            : Icons.notifications_off,
-                        iconColor:
-                            isSounding ? const Color(0xffABE7B2) : const Color(0xffB7B89F),
-                        title: 'Notification',
-                        subtitle: isSounding
-                            ? "Notification's on"
-                            : "Notification's off",
-                        trailing: Switch(
-                          value: isSounding,
-                          onChanged: updateNotificationStatus,
-                        ),
-                      ),
-
+                      // _buildSettingCard(
+                      //   isDark: isDark,
+                      //   icon: isSounding
+                      //       ? Icons.notifications_active
+                      //       : Icons.notifications_off,
+                      //   iconColor:
+                      //       isSounding ? const Color(0xffABE7B2) : const Color(0xffB7B89F),
+                      //   title: 'Notification',
+                      //   subtitle: isSounding
+                      //       ? "Notification's on"
+                      //       : "Notification's off",
+                      //   trailing: Switch(
+                      //     value: isSounding,
+                      //     onChanged: updateNotificationStatus,
+                      //   ),
+                      // ),
                       const SizedBox(height: 20),
                       Divider(
-                        color:
-                            isDark ? Colors.green[900] : Colors.green.shade200,
+                        color: isDark
+                            ? Colors.green[900]
+                            : Colors.green.shade200,
                       ),
 
                       const SizedBox(height: 20),
@@ -374,13 +385,19 @@ class _ProfileFirebaseState extends State<ProfileFirebase> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black)),
-                Text(subtitle,
-                    style: TextStyle(
-                        color: isDark ? Colors.grey[400] : Colors.grey)),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: isDark ? Colors.grey[400] : Colors.grey,
+                  ),
+                ),
               ],
             ),
           ),
@@ -411,8 +428,7 @@ class _ProfileFirebaseState extends State<ProfileFirebase> {
         ),
         subtitle: Text(
           'Version 2.0.0',
-          style:
-              TextStyle(color: isDark ? Colors.grey[400] : Colors.grey),
+          style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey),
         ),
         onTap: () {
           Navigator.push(

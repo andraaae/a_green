@@ -149,7 +149,7 @@ class _LoginFirebaseState extends State<LoginFirebase> {
                           return;
                         }
 
-                        // 🔥 SIMPAN UID (WAJIB)
+
                         await PreferenceHandlerFirebase.saveUid(user.uid ?? "");
 
                         // SAVE STATUS LOGIN
