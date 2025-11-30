@@ -9,27 +9,32 @@ class PlantTipDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor:
-            theme.appBarTheme.backgroundColor ?? theme.primaryColor,
-        iconTheme:
-            theme.appBarTheme.iconTheme ??
-            IconThemeData(color: colors.onPrimary),
+        backgroundColor: isDark
+            ? const Color(0xFF1E1E1E)   // background dark mode
+            : const Color(0xFFCBF3BB), // background light mode
+        elevation: 0,
+
+        // back button color
+        iconTheme: IconThemeData(
+          color: isDark ? Colors.white : Colors.black87,
+        ),
+
+        // title text color
         title: Text(
           title,
-          style:
-              theme.appBarTheme.titleTextStyle ??
-              TextStyle(
-                color: colors.onPrimary,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black87,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: SingleChildScrollView(
@@ -38,7 +43,7 @@ class PlantTipDetail extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               height: 1.45,
-              color: colors.onSurface,
+              color: isDark ? Colors.white70 : Colors.black87,
             ),
           ),
         ),

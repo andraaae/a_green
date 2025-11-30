@@ -88,6 +88,7 @@ class _JournalFirebaseState extends State<JournalFirebase> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),

@@ -66,7 +66,7 @@ class AboutAgreen extends StatelessWidget {
           Divider(thickness: 1, color: accentColor.withOpacity(0.4)),
           const SizedBox(height: 8),
           Text(
-            'Version: 2.0.0\n'
+            'Version: 1.0.0\n'
             'Developed by: andra\n'
             'Contact: agreen.support@gmail.com',
             style: TextStyle(fontSize: 14, color: subTextColor),

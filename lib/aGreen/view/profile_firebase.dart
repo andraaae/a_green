@@ -427,7 +427,7 @@ class _ProfileFirebaseState extends State<ProfileFirebase> {
           ),
         ),
         subtitle: Text(
-          'Version 2.0.0',
+          'Version 1.0.0',
           style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey),
         ),
         onTap: () {

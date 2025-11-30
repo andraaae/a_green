@@ -19,7 +19,7 @@ class _ButtomNavigationAgreenState extends State<ButtomNavigationAgreen> {
   void initState() {
     super.initState();
     _pages = [
-      HomePageFirebase(), //sampe sini
+      HomePageFirebase(),
       ReminderFirebase(),
       const SizedBox(), // kosong untuk posisi tombol add
       JournalFirebase(),
@@ -29,21 +29,11 @@ class _ButtomNavigationAgreenState extends State<ButtomNavigationAgreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Stack(
+  children: [
+    Scaffold(
+      resizeToAvoidBottomInset: false,
       body: _pages[_selectedIndex],
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xffA8D69F),
-        shape: const CircleBorder(),
-        elevation: 4,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddPlantsFirebase()),
-          );
-        },
-        child: const Icon(Icons.add, size: 30),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         height: 70,
         shape: const CircularNotchedRectangle(),
@@ -53,14 +43,38 @@ class _ButtomNavigationAgreenState extends State<ButtomNavigationAgreen> {
           children: [
             navigationItem(Icons.home_outlined, "Home", 0),
             navigationItem(Icons.watch_later, "Reminder", 1),
-            const SizedBox(width: 40), // ruang buat FAB
+            const SizedBox(width: 40), // UNTUK FAB
             navigationItem(Icons.menu_book_rounded, "Journal", 3),
             navigationItem(Icons.person_outline, "Profile", 4),
           ],
         ),
       ),
-    );
-  }
+    ),
+
+    Positioned(
+      bottom: 45,
+      left: 0,
+      right: 0,
+      child: Center(
+          child: FloatingActionButton(
+            backgroundColor: const Color(0xffA8D69F),
+            shape: const CircleBorder(),
+            elevation: 4,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AddPlantsFirebase()),
+              );
+            },
+            child: const Icon(Icons.add, size: 30),
+          ),
+        ),
+      ),
+    
+  ],
+);
+}
 
   Widget navigationItem(IconData icon, String label, int index) {
     final isActive = _selectedIndex == index;

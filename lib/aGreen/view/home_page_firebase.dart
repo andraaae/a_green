@@ -3,13 +3,13 @@ import 'package:a_green/aGreen/models/plant_model_firebase.dart';
 import 'package:a_green/aGreen/models/user_firebase.dart';
 import 'package:a_green/aGreen/service/firebase.dart';
 import 'package:a_green/aGreen/service/notification_service.dart';
-// import 'package:a_green/aGreen/view/plant_tips.dart';
+import 'package:a_green/aGreen/view/plant_tips.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+
+
 
 class HomePageFirebase extends StatefulWidget {
   const HomePageFirebase({super.key});
@@ -140,7 +140,6 @@ class _HomePageFirebaseState extends State<HomePageFirebase> {
     return (diff / freq).clamp(0.0, 1.0);
   }
 
-  // Helper: apakah sudah waktunya disiram?
   bool isTimeToWaterPlant(PlantModelFirebase plant) {
     if (plant.lastWateredDate == null) return true;
 
@@ -255,6 +254,7 @@ class _HomePageFirebaseState extends State<HomePageFirebase> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 20),
               Text(
                 "Hello, ${dataUser?.username}!",
                 style: TextStyle(
@@ -272,6 +272,55 @@ class _HomePageFirebaseState extends State<HomePageFirebase> {
                 ),
               ),
               const SizedBox(height: 20),
+
+            ElevatedButton(
+                onPressed: () {
+              Navigator.push(context,
+              MaterialPageRoute(builder: (context) => PlantTips()),
+            );
+          },
+        style: ElevatedButton.styleFrom(
+      backgroundColor: isDark 
+        ? const Color(0xFF2A2A2A)  // dark card
+        : Colors.white,             // light card
+    foregroundColor: theme.colorScheme.onSurface,
+    elevation: isDark ? 0 : 3,
+    padding: EdgeInsets.zero,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+    ),
+  ),
+  child: Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(16),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Plant Tips",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+
+        SizedBox(height: 4),
+
+        Text(
+          "A minimal tips for your plants",
+          style: TextStyle(
+            fontSize: 13,
+            color: theme.colorScheme.onSurface.withOpacity(0.7),
+          ),
+        ),
+      ],
+    ),
+  ),
+),
+
+SizedBox(height: 20),
+
               Text(
                 "Your Plants",
                 style: TextStyle(

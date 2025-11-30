@@ -1,7 +1,7 @@
 import 'package:a_green/aGreen/database/preference_handler_firebase.dart';
 import 'package:a_green/aGreen/models/plant_model_firebase.dart';
-// import 'package:a_green/aGreen/service/firebase.dart';
-import 'package:a_green/aGreen/service/notification_service.dart'; // ⬅️ TAMBAHKAN INI
+//  import 'package:a_green/aGreen/service/firebase.dart';
+import 'package:a_green/aGreen/service/notification_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -18,7 +18,7 @@ class AddPlantsFirebase extends StatefulWidget {
 class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
   final formKey = GlobalKey<FormState>();
   final plantname = TextEditingController();
-  bool TEST_MODE = true; // ubah ke false kalau sudah selesai testing
+  // bool TEST_MODE = true;
 
   String? dropDownType;
   String? dropDownFrequency;
@@ -101,7 +101,7 @@ class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
   ];
 
   final List<String> frequencyitem = [
-    "1 weeks",
+    "a week",
     "2 weeks",
     "Every 3 days",
     "Every 4 days",
@@ -262,7 +262,7 @@ class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
                           .collection("plants")
                           .add({
                             ...plantFirebase.ToFirestore(),
-                            "hasNotified": false, // ⬅️ STEP 1 BERHASIL DIPASANG
+                            "hasNotified": false,
                           });
 
                       // Ambil angka dari frequency
@@ -322,6 +322,7 @@ class _AddPlantsFirebaseState extends State<AddPlantsFirebase> {
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
+                          behavior: SnackBarBehavior.floating,
                           content: Text("Plant added successfully!"),
                         ),
                       );

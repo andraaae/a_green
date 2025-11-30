@@ -23,7 +23,6 @@ Future<void> alarmCallback(int id) async {
   try {
     await _notif.initialize(initSettings);
   } catch (e) {
-    // fallback ke launcher icon jika drawable tidak tersedia
     const AndroidInitializationSettings fallbackInit =
         AndroidInitializationSettings('@mipmap/launcher_icon');
     const InitializationSettings fallbackSettings = InitializationSettings(

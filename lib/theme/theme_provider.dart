@@ -27,7 +27,7 @@ final ThemeData lightTheme = ThemeData(
   ),
 );
 
-// 🌙 Dark Theme
+// Dark Theme
 final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
   scaffoldBackgroundColor: const Color(0xff1E1E1E),
